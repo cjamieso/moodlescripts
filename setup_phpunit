@@ -1,0 +1,11 @@
+# Create a directory for the phpunit dataroot.
+mkdir -p "$HOME"/roots/phpunit
+
+# The phpunit dataroot and prefix..
+sed -i \
+-e "/require_once/i \\\$CFG->phpunit_dataroot = '\/home\/travis\/roots\/phpunit';" \
+-e "/require_once/i \\\$CFG->phpunit_prefix = 'p_';" \
+config.php ;
+
+# Initialise PHPUnit for Moodle.
+php admin/tool/phpunit/cli/init.php
