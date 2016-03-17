@@ -1,8 +1,10 @@
 #!/bin/bash
 
-if [-z "$2" ];
+if [-z "$TRAVIS_BUILD_DIR" ];
 then
     DIR = /vagrant
+else
+    DIR = $TRAVIS_BUILD_DIR
 fi
 
 if [ "$1" = "analytics" ];
