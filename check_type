@@ -1,12 +1,12 @@
 #!/bin/bash
 
-if git log --oneline -1 | grep analytics ; then
+if git log --oneline -1 | grep -q "analytics" ; then
 	echo 'analytics'
-elif git log --oneline -1 | grep mail ; then
+elif git log --oneline -1 | grep -q "mail" ; then
 	echo 'mail'
-elif git log --oneline -1 | grep skills_group ; then
+elif git log --oneline -1 | grep -q "skills_group" ; then
 	echo 'sg'
-elif git log --oneline -1 | grep nurs_navigation ; then
+elif git log --oneline -1 | grep -q "nurs_navigation" ; then
 	echo 'nn'
 else
 	echo 'Did not find a project trigger to test.';
