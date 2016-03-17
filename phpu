@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# For travis builds, use its home dir, otherwise use /vagrant
 if [ -z "$TRAVIS_BUILD_DIR" ];
 then
     export DIR=/vagrant
@@ -7,14 +8,12 @@ else
     export DIR=$TRAVIS_BUILD_DIR
 fi
 
+# Check for piped input, otherwise use $1
 export TESTTYPE=`cat`;
-
 if [ -z $TESTTYPE ];
 then
 	export $TESTTYPE=$1
 fi
-
-echo "request was: $TESTTYPE";
 
 if [ "$TESTTYPE" = "analytics" ];
 then
