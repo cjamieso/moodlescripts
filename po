@@ -1,0 +1,13 @@
+#1/bin/bash
+
+if [[ "$1" =~ ^[0-9]+$ ]]; then
+	echo "pushing to test, wip-LMS-$1"
+	echo "numeric detected, pushing to test"
+	git push origin wip-LMS-$1:refs/for/TEST_28
+elif [ "$1" = "dev" ]; then
+	echo "pushing code to dev"
+	git push origin DEVEL:DEV_28
+else
+	echo "intended usage: dev | number"
+fi
+

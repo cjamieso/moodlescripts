@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if [ "$1" = "create" ];
+then
+	echo "creating DEVEL branch based on DEV_28"
+	git checkout -b DEVEL origin/DEV_28
+elif [ "$1" = "delete" ];
+then
+	echo "deleting DEVEL branch"
+	git branch -D DEVEL
+fi
+

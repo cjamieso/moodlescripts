@@ -1,0 +1,26 @@
+#!/bin/bash
+# behat
+export DISPLAY=:10
+(java -jar /home/vagrant/selenium-server-standalone.jar > /dev/null 2>&1)& >/dev/null 2>&1
+(sudo Xvfb :10 -ac -noreset 2>/dev/null & )& > /dev/null 2>&1
+
+if [ "$1" = "analytics" ];
+then
+	echo "Starting report/analytics tests"
+	/vagrant/vendor/bin/behat --config /b_moodledata/behat/behat.yml --tags @report_analytics
+elif [ "$1" = "sg" ];
+then
+	echo "Starting blocks/skills_group tests"
+	/vagrant/vendor/bin/behat --config /b_moodledata/behat/behat.yml --tags @block_skills_group
+elif [ "$1" = "mail" ];
+then
+	echo "Starting blocks/course_message tests"
+	/vagrant/vendor/bin/behat --config /b_moodledata/behat/behat.yml --tags @block_course_message
+elif [ "$1" = "wip" ];
+then
+	echo "Starting work-in-progress tests"
+	/vagrant/vendor/bin/behat --config /b_moodledata/behat/behat.yml --tags @wip
+else
+	echo "Test type not found"
+fi
+

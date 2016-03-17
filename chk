@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ "$1" != "" ];
+then
+
+    echo "checking out branch wip-LMS-$1"
+    git checkout -b wip-LMS-$1
+fi

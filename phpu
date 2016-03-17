@@ -1,0 +1,27 @@
+#!/bin/bash
+
+if [-z "$2" ];
+then
+    DIR = /vagrant
+fi
+
+if [ "$1" = "analytics" ];
+then
+	echo "running report/analytics tests"
+	phpunit -c $DIR/report/analytics/unittest.xml
+elif [ "$1" = "mail" ];
+then
+	echo "running blocks/course_message tests"
+	phpunit -c $DIR/blocks/course_message/unittest.xml
+elif [ "$1" = "sg" ];
+then
+	echo "running blocks/skills_group tests"
+	phpunit -c $DIR/blocks/skills_group/unittest.xml
+elif [ "$1" = "nn" ];
+then
+	echo "running blocks/nurs_navigation tests"
+	phpunit -c $DIR/blocks/nurs_navigation/unittest.xml
+else
+	echo "tests suite not found"
+fi
+

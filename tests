@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ "$1" = "phpunit" ];
+then
+	echo "resetting phpunit tests"
+	php /vagrant/admin/tool/phpunit/cli/init.php
+elif [ "$1" = "behat" ];
+then
+	echo "resetting behat tests"
+	php /vagrant/admin/tool/behat/cli/init.php
+else
+	echo "incorrect option given, use either phpunit|behat"
+fi
+
