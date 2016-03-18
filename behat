@@ -15,10 +15,12 @@ else
 fi
 
 # Check for piped input, otherwise use $1
-export TESTTYPE=`cat`;
-if [ -z $TESTTYPE ];
+read -t 1 dummy
+if [ -z $dummy ];
 then
-    export $TESTTYPE=$1
+    export TESTTYPE=$1
+else
+    export TESTTYPE=$dummy
 fi
 
 if [ "$TESTTYPE" = "analytics" ];
