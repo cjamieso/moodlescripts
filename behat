@@ -12,10 +12,6 @@ then
 else
     export DIR=$TRAVIS_BUILD_DIR
     export YMLDIR=/home/travis/roots/behat/behat
-    export DISPLAY=:99.0
-    /etc/init.d/xvfb start
-    (php -S localhost:8000 &) 2> /dev/null > /dev/null
-    (java -jar selenium-server-standalone.jar > /dev/null 2>&1) & >/dev/null 2>&1
 fi
 
 # Check for piped input, otherwise use $1
