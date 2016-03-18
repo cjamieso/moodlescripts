@@ -1,0 +1,36 @@
+#!/bin/bash
+# behat
+
+# Set home folder
+if [ -z "$TRAVIS_BUILD_DIR" ];
+then
+    export DIR=/vagrant
+else
+    export DIR=$TRAVIS_BUILD_DIR
+fi
+
+# Check for piped input, otherwise use $1
+read -t 1 dummy
+if [ -z $dummy ];
+then
+    export TESTTYPE=$1
+else
+    export TESTTYPE=$dummy
+fi
+
+if [ "$TESTTYPE" = "analytics" ];
+then
+    echo "Running codechecker on report/analytics"
+    php $DIR/local/codechecker/run.php /report/analytics
+elif [ "$TESTTYPE" = "sg" ];
+then
+    echo "Running codechecker on blocks/skills_group"
+    php $DIR/local/codechecker/run.php /blocks/skills_group
+elif [ "$TESTTYPE" = "mail" ];
+then
+    echo "Running codechecker on blocks/course_message"
+    php $DIR/local/codechecker/run.php /blocks/course_message
+else
+    echo "Plugin type not found"
+fi
+
