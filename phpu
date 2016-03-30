@@ -1,5 +1,27 @@
 #!/bin/bash
 
+function runtests {
+	if [ "$TESTTYPE" = "analytics" ];
+	then
+		echo "running report/analytics tests"
+		$DIR/vendor/bin/phpunit -c $DIR/report/analytics/unittest.xml
+	elif [ "$TESTTYPE" = "mail" ];
+	then
+		echo "running blocks/course_message tests"
+		$DIR/vendor/bin/phpunit -c $DIR/blocks/course_message/unittest.xml
+	elif [ "$TESTTYPE" = "sg" ];
+	then
+		echo "running blocks/skills_group tests"
+		$DIR/vendor/bin/phpunit -c $DIR/blocks/skills_group/unittest.xml
+	elif [ "$TESTTYPE" = "nn" ];
+	then
+		echo "running blocks/nurs_navigation tests"
+		$DIR/vendor/bin/phpunit -c $DIR/blocks/nurs_navigation/unittest.xml
+	else
+		echo "tests suite not found"
+	fi
+}
+
 # For travis builds, use its home dir, otherwise use /vagrant
 if [ -z "$TRAVIS_BUILD_DIR" ];
 then
@@ -8,32 +30,16 @@ else
     export DIR=$TRAVIS_BUILD_DIR
 fi
 
-# Check for piped input, otherwise use $1
-read -t 1 dummy
-if [ -z $dummy ];
+# Use file for tests if it exists, otherwise use $1
+if [ -f "paths.txt" ];
 then
+	while read -r line || [[ -n "$line" ]];
+	do
+		export TESTTYPE=$line
+		runtests
+	done < "paths.txt"
+else
 	export TESTTYPE=$1
-else
-	export TESTTYPE=$dummy
-fi
-
-if [ "$TESTTYPE" = "analytics" ];
-then
-	echo "running report/analytics tests"
-	$DIR/vendor/bin/phpunit -c $DIR/report/analytics/unittest.xml
-elif [ "$TESTTYPE" = "mail" ];
-then
-	echo "running blocks/course_message tests"
-	$DIR/vendor/bin/phpunit -c $DIR/blocks/course_message/unittest.xml
-elif [ "$TESTTYPE" = "sg" ];
-then
-	echo "running blocks/skills_group tests"
-	$DIR/vendor/bin/phpunit -c $DIR/blocks/skills_group/unittest.xml
-elif [ "$TESTTYPE" = "nn" ];
-then
-	echo "running blocks/nurs_navigation tests"
-	$DIR/vendor/bin/phpunit -c $DIR/blocks/nurs_navigation/unittest.xml
-else
-	echo "tests suite not found"
+	runtests
 fi
 

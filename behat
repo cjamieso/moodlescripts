@@ -1,5 +1,26 @@
 #!/bin/bash
-# behat
+
+function runtests {
+    if [ "$TESTTYPE" = "analytics" ];
+    then
+        echo "Starting report/analytics tests"
+        $DIR/vendor/bin/behat --config $YMLDIR/behat.yml --tags @report_analytics
+    elif [ "$TESTTYPE" = "sg" ];
+    then
+        echo "Starting blocks/skills_group tests"
+        $DIR/vendor/bin/behat --config $YMLDIR/behat.yml --tags @block_skills_group
+    elif [ "$TESTTYPE" = "mail" ];
+    then
+        echo "Starting blocks/course_message tests"
+        $DIR/vendor/bin/behat --config $YMLDIR/behat.yml --tags @block_course_message
+    elif [ "$TESTTYPE" = "wip" ];
+    then
+        echo "Starting work-in-progress tests"
+        $DIR/vendor/bin/behat --config $YMLDIR/behat.yml --tags @wip
+    else
+        echo "Test type not found"
+    fi
+}
 
 # For non-travis builds, start the jar and xvfb
 if [ -z "$TRAVIS_BUILD_DIR" ];
@@ -14,32 +35,18 @@ else
     export YMLDIR=/home/travis/roots/behat/behat
 fi
 
-# Check for piped input, otherwise use $1
-read -t 1 dummy
-if [ -z $dummy ];
+# Use file for tests if it exists, otherwise use $1
+if [ -f "paths.txt" ];
 then
-    export TESTTYPE=$1
+    while read -r line || [[ -n "$line" ]];
+    do
+        export TESTTYPE=$line
+        runtests
+    done < "paths.txt"
 else
-    export TESTTYPE=$dummy
+    export TESTTYPE=$1
+    runtests
 fi
 
-if [ "$TESTTYPE" = "analytics" ];
-then
-	echo "Starting report/analytics tests"
-	$DIR/vendor/bin/behat --config $YMLDIR/behat.yml --tags @report_analytics
-elif [ "$TESTTYPE" = "sg" ];
-then
-	echo "Starting blocks/skills_group tests"
-	$DIR/vendor/bin/behat --config $YMLDIR/behat.yml --tags @block_skills_group
-elif [ "$TESTTYPE" = "mail" ];
-then
-	echo "Starting blocks/course_message tests"
-	$DIR/vendor/bin/behat --config $YMLDIR/behat.yml --tags @block_course_message
-elif [ "$TESTTYPE" = "wip" ];
-then
-	echo "Starting work-in-progress tests"
-	$DIR/vendor/bin/behat --config $YMLDIR/behat.yml --tags @wip
-else
-	echo "Test type not found"
-fi
+
 
