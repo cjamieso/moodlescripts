@@ -72,4 +72,6 @@ foreach ($paths as $path) {
     }
 }
 
+print_r($paths);
+
 fclose($file);
