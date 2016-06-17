@@ -24,6 +24,7 @@
 
 define('CLI_SCRIPT', true);
 $ignorenames = array('jquery.multiple.select.js');
+$ignoretypes = array('feature');
 
 require(dirname(__FILE__) . '/../config.php');
 require_once($CFG->libdir . '/clilib.php');
@@ -41,9 +42,11 @@ foreach ($files as $file) {
         $pathparts = pathinfo($file);
         // This skips any folders that might exist.
         if (isset($pathparts['extension'])) {
-            $filename = $pathparts['filename'] . $pathparts['extension'];
-            if (array_search($filename, $ignorenames) === false) {
-                $keep[] = local_codechecker_clean_path($CFG->dirroot . '/' . trim($file, '/'));
+            if (array_search($pathparts['extension'], $ignoretypes) === false) {
+                $filename = $pathparts['filename'] . $pathparts['extension'];
+                if (array_search($filename, $ignorenames) === false) {
+                    $keep[] = local_codechecker_clean_path($CFG->dirroot . '/' . trim($file, '/'));
+                }
             }
         }
     }
