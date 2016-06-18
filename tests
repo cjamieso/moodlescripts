@@ -8,7 +8,13 @@ elif [ "$1" = "behat" ];
 then
 	echo "resetting behat tests"
 	php /vagrant/admin/tool/behat/cli/init.php
+elif [ "$1" = "phpmd" ];
+then
+    echo "configuring phpmd"
+    cd /vagrant/phpmd
+    git submodule update --init --recursive
+    composer install
 else
-	echo "incorrect option given, use either phpunit|behat"
+	echo "incorrect option given, use either phpunit|behat|phpmd"
 fi
 
