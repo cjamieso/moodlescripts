@@ -1,0 +1,47 @@
+#!/bin/bash
+
+function runtests {
+    if [ "$TESTTYPE" = "analytics" ];
+    then
+        echo "running phpmd on report/analytics"
+        $DIR/phpmd/src/bin/phpmd $DIR/report/analytics/ text $XMLDIR/moodlemd.xml
+    elif [ "$TESTTYPE" = "mail" ];
+    then
+        echo "running phpmd on blocks/course_message"
+        $DIR/phpmd/src/bin/phpmd $DIR/blocks/course_message/ text $XMLDIR/moodlemd.xml
+    elif [ "$TESTTYPE" = "sg" ];
+    then
+        echo "running phpmd on blocks/skills_group"
+        $DIR/phpmd/src/bin/phpmd $DIR/blocks/skills_group/ text $XMLDIR/moodlemd.xml
+    elif [ "$TESTTYPE" = "nn" ];
+    then
+        echo "running phpmd on blocks/nurs_navigation"
+        $DIR/phpmd/src/bin/phpmd $DIR/blocks/nurs_navigation/ text $XMLDIR/moodlemd.xml
+    else
+        echo "tests suite not found"
+    fi
+}
+
+# For travis builds, use its home dir, otherwise use /vagrant
+if [ -z "$TRAVIS_BUILD_DIR" ];
+then
+    export DIR=/vagrant
+    export XMLDIR=/home/vagrant
+else
+    export DIR=$TRAVIS_BUILD_DIR
+    export XMLDIR=$TRAVIS_BUILD_DIR/moodlescripts
+fi
+
+# Use file for tests if it exists, otherwise use $1
+if [ -f "paths.txt" ];
+then
+    while read -r line || [[ -n "$line" ]];
+    do
+        export TESTTYPE=$line
+        runtests
+    done < "paths.txt"
+else
+    export TESTTYPE=$1
+    runtests
+fi
+
