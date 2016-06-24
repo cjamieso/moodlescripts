@@ -3,8 +3,10 @@ echo 'date.timezone = "America/Edmonton"' >> ~/.phpenv/versions/$(phpenv version
 # Copy generic configuration in place.
 cp config-dist.php config.php ;
 
-# Create the moodledata directory.
+# Create the moodledata directory (behat data directory, behat fail directory)
 mkdir -p "$HOME"/roots/base
+mkdir -p "$HOME"/roots/behat
+mkdir -p "$HOME"/roots/behatfail
 
 # The database name and password.
 sed -i \

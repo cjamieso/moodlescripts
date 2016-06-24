@@ -6,6 +6,7 @@ sed -i \
 -e "/require_once/i \\\$CFG->behat_dataroot = '\/home\/travis\/roots\/behat';" \
 -e "/require_once/i \\\$CFG->behat_prefix = 'b_';" \
 -e "/require_once/i \\\$CFG->behat_wwwroot = 'http://localhost:8000';" \
+-e "/require_once/i \\\$CFG->behat_faildump_path = '\/home\/travis\/roots\/behatfail';" \
 config.php ;
 
 # Initialise PHPUnit for Moodle.
