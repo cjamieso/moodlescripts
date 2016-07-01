@@ -24,14 +24,13 @@
 
 define('CLI_SCRIPT', true);
 $ignorenames = array('jquery.multiple.select.js');
-$ignoretypes = array('feature');
+$ignoretypes = array('feature, png, svg');
 
 require(dirname(__FILE__) . '/../config.php');
 require_once($CFG->libdir . '/clilib.php');
 require_once($CFG->dirroot . '/local/codechecker/locallib.php');
 
 chdir('../');
-// exec('git diff --name-only HEAD HEAD~2', $files);
 exec('git diff-tree --no-commit-id --name-only -r HEAD', $files);
 chdir('local/codechecker');
 
