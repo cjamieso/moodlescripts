@@ -24,7 +24,7 @@
 
 define('CLI_SCRIPT', true);
 $ignorenames = array('jquery.multiple.select.js');
-$ignoretypes = array('feature, png, svg');
+$ignoretypes = array('feature', 'png', 'svg');
 
 require(dirname(__FILE__) . '/../config.php');
 require_once($CFG->libdir . '/clilib.php');
