@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [ -z $LASTBRANCH ]; then
+	echo "No last branch found, did you forget to use .?"
+	exit 1
+fi
+
+echo "Running diff on branch: ${LASTBRANCH}"
+git diff --stat origin/${LASTBRANCH} ${LASTBRANCH}
+

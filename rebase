@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [ -z "$1" ] || [ -z "$2" ] ; then
+	echo "missing argument"
+	echo "usage: rebase branch ontobranch"
+	exit 1
+fi
+
+BRANCH="$(git name-rev --name-only HEAD)" 
+if [ "$BRANCH" != "$1" ]; then
+	echo "branch is not correct, switching"
+	git checkout $1
+fi
+UPSTREAM="$(git rev-parse HEAD~1)"
+ONTO="$2"
+export LASTBRANCH="$1"
+
+git rebase --onto ${ONTO} ${UPSTREAM}
+
