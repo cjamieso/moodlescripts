@@ -17,6 +17,10 @@ function runtests {
 	then
 		echo "running blocks/nurs_navigation tests"
 		$DIR/vendor/bin/phpunit -c $DIR/blocks/nurs_navigation/unittest.xml
+	elif [ "TESTTYPE" = "labels" ];
+	then
+		echo "running course/format/collblct tests"
+		$DIR/vendor/bin/phpunit -c $DIR/course/format/collblct/unittest.xml
 	else
 		echo "tests suite not found"
 	fi

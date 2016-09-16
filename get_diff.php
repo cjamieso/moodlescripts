@@ -65,7 +65,7 @@ foreach ($paths as $path) {
             fwrite($file, "nn\n");
             break;
         case 'course/format/collblct':
-            exec('ls');
+            fwrite($file, "labels\n");
             break;
         default:
             // Do nothing.

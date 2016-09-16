@@ -17,6 +17,10 @@ function runtests {
     then
         echo "Starting work-in-progress tests"
         $DIR/vendor/bin/behat --config $YMLDIR/behat.yml --tags @wip
+    elif [ "$TESTTYPE" = "labels" ];
+    then
+        echo "Starting collapsed labels tests"
+        $DIR/vendor/bin/behat --config $YMLDIR/behat.yml --tags @format_collblct
     else
         echo "Test type not found"
     fi
