@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ "$1" = "home" ];
+then
+    export DIR=cjami
+elif [ "$1" = "work" ];
+then
+    export DIR=cjamieso
+else
+    echo "missing argument"
+    echo "usage: bfail {home|work}"
+    exit 1
+fi
+
+scp -rp vagrant:/behat_fail/* /mnt/c/Users/$DIR/Desktop
