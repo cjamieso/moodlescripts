@@ -6,7 +6,15 @@ if [ -z "$1" ] || [ -z "$2" ] ; then
 	exit 1
 fi
 
-BRANCH="$(git name-rev --name-only HEAD)" 
+# Check to make sure ontobranch exists locally.
+# if [ -z `git branch | egrep "^\*?[[:space:]]+$2"` ]; then
+#     echo 'ontobranch exists, continuing'
+# else
+#     echo 'ontobranch does not exist, checking out upstream'
+#     git checkout -b $2 origin/$2
+# fi
+
+BRANCH="$(git name-rev --name-only HEAD)"
 if [ "$BRANCH" != "$1" ]; then
 	echo "branch is not correct, switching"
 	git checkout $1
