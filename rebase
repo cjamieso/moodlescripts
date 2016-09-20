@@ -1,16 +1,28 @@
 #!/bin/bash
 
-if [ -z "$1" ] || [ -z "$2" ] ; then
+if [ -z "$1" ]; then
 	echo "missing argument"
 	echo "usage: rebase branch ontobranch"
 	exit 1
 fi
+if [ -z "$2" ]; then
+    if [ -z "$LASTBRANCH" ]; then
+        echo "missing argument"
+        echo "No last branch found, did you forget to use .?"
+        echo "usage: rebase branch ontobranch"
+        exit 1
+    else
+        ONTO="$LASTBRANCH"
+    fi
+else
+    ONTO="$2"
+fi
 
 # Check to make sure ontobranch exists locally.
-TEMP="$(git branch | egrep "^\*?[[:space:]]+$2")"
+TEMP="$(git branch | egrep "^\*?[[:space:]]+$ONTO")"
 if [ -z "$TEMP" ]; then
     echo 'ontobranch does not exist, checking out upstream'
-    git checkout -b $2 origin/$2
+    git checkout -b $ONTO origin/$ONTO
 else
     echo 'ontobranch exists, continuing'
 fi
@@ -22,7 +34,6 @@ if [ "$BRANCH" != "$1" ]; then
 	git checkout $1
 fi
 UPSTREAM="$(git rev-parse HEAD~1)"
-ONTO="$2"
 export LASTBRANCH="$1"
 
 # This will rebase commits from UPSTREAM->BRANCH (excluding UPSTREAM) on the branch ONTO
