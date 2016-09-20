@@ -1,0 +1,21 @@
+#!/bin/bash
+
+if [ "$1" = "home" ];
+then
+    export DIR=/mnt/d
+elif [ "$1" = "work" ];
+then
+    export DIR=/mnt/c/Users/cjamieso
+else
+    echo "missing argument"
+    echo "usage: update_theme {home|work}"
+    exit 1
+fi
+
+echo "Make sure that node + recess are installed"
+echo "Ensure that eclass-unified is set to an updated branch"
+
+sudo rm -rf $DIR/moodle289/theme/eclass
+cp -R $DIR/GitProjects/eclass-unified/theme/eclass $DIR/GitProjects/moodle289/theme
+cd $DIR/GitProjects/moodle289/theme/eclass/less
+recess --compile --compress eclass.less > ../style/eclass.css

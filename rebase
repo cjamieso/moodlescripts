@@ -7,13 +7,15 @@ if [ -z "$1" ] || [ -z "$2" ] ; then
 fi
 
 # Check to make sure ontobranch exists locally.
-# if [ -z `git branch | egrep "^\*?[[:space:]]+$2"` ]; then
-#     echo 'ontobranch exists, continuing'
-# else
-#     echo 'ontobranch does not exist, checking out upstream'
-#     git checkout -b $2 origin/$2
-# fi
+TEMP="$(git branch | egrep "^\*?[[:space:]]+$2")"
+if [ -z "$TEMP" ]; then
+    echo 'ontobranch does not exist, checking out upstream'
+    git checkout -b $2 origin/$2
+else
+    echo 'ontobranch exists, continuing'
+fi
 
+# Check if we are currently on the branch to rebase.
 BRANCH="$(git name-rev --name-only HEAD)"
 if [ "$BRANCH" != "$1" ]; then
 	echo "branch is not correct, switching"
@@ -23,5 +25,6 @@ UPSTREAM="$(git rev-parse HEAD~1)"
 ONTO="$2"
 export LASTBRANCH="$1"
 
+# This will rebase commits from UPSTREAM->BRANCH (excluding UPSTREAM) on the branch ONTO
 git rebase --onto ${ONTO} ${UPSTREAM}
 
