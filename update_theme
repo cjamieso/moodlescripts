@@ -15,7 +15,7 @@ fi
 echo "Make sure that node + recess are installed"
 echo "Ensure that eclass-unified is set to an updated branch"
 
-sudo rm -rf $DIR/moodle289/theme/eclass
+sudo rm -rf $DIR/GitProjects/moodle289/theme/eclass
 cp -R $DIR/GitProjects/eclass-unified/theme/eclass $DIR/GitProjects/moodle289/theme
 cd $DIR/GitProjects/moodle289/theme/eclass/less
 recess --compile --compress eclass.less > ../style/eclass.css
