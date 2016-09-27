@@ -1,0 +1,6 @@
+#!/bin/bash
+
+echo $1
+echo $2
+psql moodle -c "update mdl_config_plugins set value = $2 where plugin = '$1';"
+
