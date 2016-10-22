@@ -10,7 +10,16 @@
     </description>
 
     <rule ref="rulesets/codesize.xml"/>
-    <rule ref="rulesets/unusedcode.xml"/>
+    <!-- Run unused code rules, but exclude unused local variables -->
+    <rule ref="rulesets/unusedcode.xml">
+        <exclude name="UnusedLocalVariable" />
+    </rule>
+    <!-- Now run the unused local variable rule, but ignore unused foreach variables -->
+    <rule ref="rulesets/unusedcode.xml/UnusedLocalVariable">
+        <properties>
+            <property name="allow-unused-foreach-variables" value="true" />
+        </properties>
+    </rule>
     <rule ref="rulesets/naming.xml">
         <!-- This rule throws out a problem on var names less than three chars, Moodle has $DB, $rs, etc -->
         <exclude name="ShortVariable"/>
