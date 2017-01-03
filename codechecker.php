@@ -23,7 +23,7 @@
  */
 
 define('CLI_SCRIPT', true);
-$ignorenames = array('jquery.multiple.select.js');
+$ignorenames = array('jquery.multiple.select.js', 'd3.js', 'd3.layout.cloud.js', 'd3tip.js');
 $ignoretypes = array('feature', 'png', 'PNG', 'xml', 'svg', 'txt', 'md');
 
 require(dirname(__FILE__) . '/../config.php');
