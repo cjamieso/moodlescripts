@@ -16,8 +16,8 @@ php admin/tool/behat/cli/init.php
 # Setup grunt and build the min sources.
 if [ "$MOODLEVERSION" = "313" ];
 then
-    npm install --no-bin-links
-    npm install -g grunt-cli
+    npm install --no-spin
+    npm install --no-spin -g grunt-cli
     grunt amd
 fi
 
