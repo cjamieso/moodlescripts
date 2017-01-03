@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Create a directory for the phpunit dataroot.
 mkdir -p "$HOME"/roots/behat
 
@@ -11,8 +13,16 @@ config.php ;
 
 # Initialise PHPUnit for Moodle.
 php admin/tool/behat/cli/init.php
+# Setup grunt and build the min sources.
+if [ "$MOODLEVERSION" = "313" ];
+then
+    npm install --no-bin-links
+    npm install -g grunt-cli
+    grunt amd
+fi
 
-# Startup xvfb for display
+
+# Startup xvfb for display -> moved to "before_install"
 # export DISPLAY=:99.0
 # /etc/init.d/xvfb start ;
 # sleep 3
