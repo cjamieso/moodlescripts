@@ -43,6 +43,7 @@ foreach ($files as $file) {
         if (isset($pathparts['extension'])) {
             if (array_search($pathparts['extension'], $ignoretypes) === false) {
                 $filename = $pathparts['filename'] . $pathparts['extension'];
+                echo $filename;
                 if (array_search($filename, $ignorenames) === false) {
                     $keep[] = local_codechecker_clean_path($CFG->dirroot . '/' . trim($file, '/'));
                 }
