@@ -31,9 +31,7 @@ if [ -z "$TRAVIS_BUILD_DIR" ];
 then
     export DIR=/vagrant
     export YMLDIR=/b_moodledata/behat
-    export DISPLAY=:10
-    (java -jar /home/vagrant/selenium-server-standalone.jar > /dev/null 2>&1)& >/dev/null 2>&1
-    (sudo Xvfb :10 -ac -noreset 2>/dev/null & )& > /dev/null 2>&1
+    start_selenium $RUNS
 else
     export DIR=$TRAVIS_BUILD_DIR
     export YMLDIR=/home/travis/roots/behat/behat
@@ -49,6 +47,7 @@ then
     done < "paths.txt"
 else
     export TESTTYPE=$1
+    export RUNS=$2
     runtests
 fi
 

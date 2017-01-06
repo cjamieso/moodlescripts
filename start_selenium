@@ -1,0 +1,24 @@
+#!/bin/bash
+
+export SELENIUMPORT=4444
+export STARTDISPLAY=10
+
+if [ -z "$TRAVIS_BUILD_DIR" ];
+then
+    export SELENIUMPATH=/home/vagrant
+else
+    export SELENIUMPATH=$TRAVIS_BUILD_DIR;
+fi
+
+if [ -z "$1" ];
+then
+    export PARALLEL=1
+else
+    export PARALLEL=$1
+fi
+
+for ((i=0;i<=$PARALLEL;i+=1)); do
+    export DISPLAY=:$(($STARTDISPLAY+$i))
+    (java -jar $SELENIUMPATH/selenium-server-standalone.jar -port $(($SELENIUMPORT+$i)) > /dev/null 2>&1)& >/dev/null 2>&1
+    (sudo Xvfb :$(($STARTDISPLAY+$i)) -ac -noreset 2>/dev/null & )& > /dev/null 2>&1
+done;
