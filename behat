@@ -8,6 +8,10 @@ function runtests {
         ls -l /home/travis/roots/behat
         ls -l /home/travis/roots/behat/localcache
         ls -l /home/travis/roots/behat/localcache/mustache
+        cd /home/travis/roots/behat/localcache/mustache
+        cd 14*
+        cd clean
+        ls -l
     elif [ "$TESTTYPE" = "sg" ];
     then
         echo "Starting blocks/skills_group tests"
