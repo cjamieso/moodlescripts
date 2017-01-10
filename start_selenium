@@ -17,7 +17,7 @@ else
     export PARALLEL=$1
 fi
 
-for ((i=0;i<=$PARALLEL;i+=1)); do
+for ((i=0;i<$PARALLEL;i+=1)); do
     export DISPLAY=:$(($STARTDISPLAY+$i))
     (java -jar $SELENIUMPATH/selenium-server-standalone.jar -port $(($SELENIUMPORT+$i)) > /dev/null 2>&1)& >/dev/null 2>&1
     (sudo Xvfb :$(($STARTDISPLAY+$i)) -ac -noreset 2>/dev/null & )& > /dev/null 2>&1
