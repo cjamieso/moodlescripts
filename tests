@@ -4,6 +4,7 @@ if [ "$1" = "phpunit" ];
 then
 	echo "resetting phpunit tests"
 	php /vagrant/admin/tool/phpunit/cli/init.php
+    php /vagrant/admin/tool/phpunit/cli/util.php --buildcomponentconfigs
 elif [ "$1" = "behat" ];
 then
 	echo "resetting behat tests"
