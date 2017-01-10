@@ -11,3 +11,4 @@ config.php ;
 
 # Initialise PHPUnit for Moodle.
 php admin/tool/phpunit/cli/init.php
+php admin/tool/phpunit/cli/util.php --buildcomponentconfigs
