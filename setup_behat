@@ -2,6 +2,9 @@
 
 # Create a directory for the phpunit dataroot.
 mkdir -p "$HOME"/roots/behat
+chmod 777 "$HOME"/roots/behat
+mkdir -p "$HOME"/roots/behatfail
+chmod 777 "$HOME"/roots/behatfail
 
 # The phpunit dataroot and prefix..
 sed -i \
@@ -21,6 +24,9 @@ then
     grunt amd
 fi
 
+ls -l /home/travis/roots
+ls -l /home/travis/roots/behat
+ls -l /home/travis/roots/behat/localcache
 
 # Startup xvfb for display -> moved to "before_install"
 # export DISPLAY=:99.0
