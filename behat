@@ -4,14 +4,7 @@ function runtests {
     if [ "$TESTTYPE" = "analytics" ];
     then
         echo "Starting report/analytics tests"
-        $DIR/vendor/bin/behat --config $YMLDIR/behat.yml --tags @wip
-        ls -l /home/travis/roots/behat
-        ls -l /home/travis/roots/behat/localcache
-        ls -l /home/travis/roots/behat/localcache/mustache
-        cd /home/travis/roots/behat/localcache/mustache
-        cd 14*
-        cd clean
-        ls -l
+        $DIR/vendor/bin/behat --config $YMLDIR/behat.yml --tags @report_analytics
     elif [ "$TESTTYPE" = "sg" ];
     then
         echo "Starting blocks/skills_group tests"

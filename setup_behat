@@ -24,10 +24,6 @@ then
     grunt amd
 fi
 
-ls -l /home/travis/roots
-ls -l /home/travis/roots/behat
-ls -l /home/travis/roots/behat/localcache
-
 # Startup xvfb for display -> moved to "before_install"
 # export DISPLAY=:99.0
 # /etc/init.d/xvfb start ;
