@@ -7,7 +7,9 @@ cp config-dist.php config.php ;
 mkdir -p "$HOME"/roots/base
 chmod 777 "$HOME"/roots/base
 mkdir -p "$HOME"/roots/behat
+chmod 777 "$HOME"/roots/behat
 mkdir -p "$HOME"/roots/behatfail
+chmod 777 "$HOME"/roots/behatfail
 
 # The database name and password.
 sed -i \
