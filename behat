@@ -4,35 +4,56 @@ function runtests {
     if [ "$TESTTYPE" = "analytics" ];
     then
         echo "Starting report/analytics tests"
-        $DIR/vendor/bin/behat --config $YMLDIR/behat.yml --tags @report_analytics
+        export TAGS=@report_analytics
+        runbehat
     elif [ "$TESTTYPE" = "sg" ];
     then
         echo "Starting blocks/skills_group tests"
-        $DIR/vendor/bin/behat --config $YMLDIR/behat.yml --tags @block_skills_group
+        export TAGS=@block_skills_group
+        runbehat
     elif [ "$TESTTYPE" = "mail" ];
     then
         echo "Starting blocks/course_message tests"
-        $DIR/vendor/bin/behat --config $YMLDIR/behat.yml --tags @block_course_message
+        export TAGS=@block_course_message
+        runbehat
     elif [ "$TESTTYPE" = "wip" ];
     then
         echo "Starting work-in-progress tests"
-        $DIR/vendor/bin/behat --config $YMLDIR/behat.yml --tags @wip
+        export TAGS=@wip
+        runbehat
     elif [ "$TESTTYPE" = "labels" ];
     then
         echo "Starting collapsed labels tests"
-        $DIR/vendor/bin/behat --config $YMLDIR/behat.yml --tags @format_collblct
+        export TAGS=@format_collblct
+        runbehat
     else
         echo "Test type not found"
     fi
 }
 
+function runbehat {
+    if [ "$PARALLEL" -gt 1 ];
+    then
+        echo "running behat tests in parallel"
+        lsof | grep 4444
+        lsof | grep 8000
+        php $DIR/admin/tool/behat/cli/run.php --tags=$TAGS
+    else
+        echo "running single behat test thread"
+        $DIR/vendor/bin/behat --config $YMLDIR/behat.yml --tags $TAGS
+    fi
+}
+
 # Check for parallel option and default to 1
-if [ -z "$2" ];
+if [ -z "$PARALLEL" ];
 then
-    echo "no option provided for parallel, using 1"
-    export RUNS=1
-else
-    export RUNS=$2
+    if [ -z "$2" ] ;
+    then
+        echo "no option provided for parallel, using 1"
+        export PARALLEL=1
+    else
+        export PARALLEL=$2
+    fi
 fi
 
 # For non-travis builds, start the jar and xvfb
@@ -40,7 +61,7 @@ if [ -z "$TRAVIS_BUILD_DIR" ];
 then
     export DIR=/vagrant
     export YMLDIR=/b_moodledata/behat
-    start_selenium $RUNS
+    start_selenium $PARALLEL
 else
     export DIR=$TRAVIS_BUILD_DIR
     export YMLDIR=/home/travis/roots/behat/behat
@@ -58,6 +79,3 @@ else
     export TESTTYPE=$1
     runtests
 fi
-
-
-

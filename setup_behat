@@ -1,21 +1,51 @@
 #!/bin/bash
 
-# Create a directory for the phpunit dataroot.
-mkdir -p "$HOME"/roots/behat
-chmod 777 "$HOME"/roots/behat
+# Create a directory for the behat dataroot.
+mkdir -p "$HOME"/roots/behatdata
+chmod 777 "$HOME"/roots/behatdata
 mkdir -p "$HOME"/roots/behatfail
 chmod 777 "$HOME"/roots/behatfail
 
-# The phpunit dataroot and prefix..
+if [ "$PARALLEL" -gt 1 ];
+then
+    mkdir -p "$HOME/roots/b_moodledata1"
+    chmod 777 "$HOME/roots/b_moodledata1"
+    mkdir -p "$HOME/roots/b_moodledata2"
+    chmod 777 "$HOME/roots/b_moodledata2"
+    mkdir -p "$HOME/roots/behatweb"
+    ln -s "$TRAVIS_BUILD_DIR" "$HOME/roots/behatweb/behatrun1"
+    ln -s "$TRAVIS_BUILD_DIR" "$HOME/roots/behatweb/behatrun2"
+fi
+
+# The behat dataroot and prefix.
 sed -i \
--e "/require_once/i \\\$CFG->behat_dataroot = '\/home\/travis\/roots\/behat';" \
+-e "/require_once/i \\\$CFG->behat_dataroot = '\/home\/travis\/roots\/behatdata';" \
 -e "/require_once/i \\\$CFG->behat_prefix = 'b_';" \
 -e "/require_once/i \\\$CFG->behat_wwwroot = 'http://localhost:8000';" \
 -e "/require_once/i \\\$CFG->behat_faildump_path = '\/home\/travis\/roots\/behatfail';" \
 config.php ;
 
-# Initialise PHPUnit for Moodle.
-php admin/tool/behat/cli/init.php
+if [ "$PARALLEL" -gt 1 ];
+then
+sed -i \
+-e "/require_once/i \\\$CFG->behat_parallel_run = array('wd_host' => 'http:\/\/127.0.0.1:4444\/wd\/hub', 'behat_wwwroot' => array(array('behat_wwwroot' => 'http:\/\/127.0.0.1:8000\/behatrun1'), array('behat_wwwroot' => 'http:\/\/127.0.0.1:8000\/behatrun2')));" \
+config.php ;
+fi
+
+# Initialise Behat for Moodle and start the webserver.
+if [ "$PARALLEL" -gt 1 ];
+then
+    php admin/tool/behat/cli/init.php --parallel=$PARALLEL
+    cd "$HOME/roots/behatweb"
+    (php -S localhost:8000 &) 2> /dev/null > /dev/null
+    cd -
+else
+    php admin/tool/behat/cli/init.php
+    cd "$TRAVIS_BUILD_DIR"
+    (php -S localhost:8000 &) 2> /dev/null > /dev/null
+    cd -
+fi
+
 # Setup grunt and build the min sources.
 if [ "$MOODLEVERSION" = "313" ];
 then
