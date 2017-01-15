@@ -64,7 +64,7 @@ then
     start_selenium $PARALLEL
 else
     export DIR=$TRAVIS_BUILD_DIR
-    export YMLDIR=/home/travis/roots/behat/behat
+    export YMLDIR=/home/travis/roots/behatdata/behat
 fi
 
 # Use file for tests if it exists, otherwise use $1
