@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ -z "$PARALLEL" ];
+then
+    export PARALLEL=1
+fi
+
 # Create a directory for the behat dataroot.
 mkdir -p "$HOME"/roots/behatdata
 chmod 777 "$HOME"/roots/behatdata
