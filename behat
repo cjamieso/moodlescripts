@@ -37,11 +37,37 @@ function runbehat {
         echo "running behat tests in parallel"
         lsof | grep 4444
         lsof | grep 8000
+        # php $DIR/admin/tool/behat/cli/run.php --tags=$TAGS --rerun="rerun{runprocess}.txt" --replace="{runprocess}"
         php $DIR/admin/tool/behat/cli/run.php --tags=$TAGS
+        exitcode=${PIPESTATUS[0]}
+        echo $exitcode
+        if [ "${exitcode}" -eq 1 ];
+        then
+            # rerunbehat
+            echo "a test failed"
+        fi
     else
         echo "running single behat test thread"
         $DIR/vendor/bin/behat --config $YMLDIR/behat.yml --tags $TAGS
     fi
+}
+
+function rerunbehat {
+    echo "re-running failed tests"
+    for ((i=1;i<=$PARALLEL;i+=1));
+    do
+        ls -l
+        rerunfile="rerun$i.txt"
+        echo $rerunfile
+        if [ -e "${rerunfile}" ];
+        then
+            if [ -s "${rerunfile}" ];
+            then
+                $DIR/vendor/bin/behat --config $YMLDIR/behat.yml --rerun $rerunfile
+                rm $rerunfile
+            fi
+        fi
+    done;
 }
 
 # Check for parallel option and default to 1
