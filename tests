@@ -1,5 +1,12 @@
 #!/bin/bash
 
+if [ -z "$2" ];
+then
+    export PARALLEL=1
+else
+    export PARALLEL=$2
+fi
+
 if [ "$1" = "phpunit" ];
 then
 	echo "resetting phpunit tests"
@@ -8,7 +15,12 @@ then
 elif [ "$1" = "behat" ];
 then
 	echo "resetting behat tests"
-	php /vagrant/admin/tool/behat/cli/init.php
+    if [ "$PARALLEL" -gt 1 ];
+    then
+        php /vagrant/admin/tool/behat/cli/init.php --parallel=$PARALLEL
+    else
+        php /vagrant/admin/tool/behat/cli/init.php
+    fi
 elif [ "$1" = "phpmd" ];
 then
     echo "configuring phpmd"
