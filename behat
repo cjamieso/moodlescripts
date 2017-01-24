@@ -46,6 +46,7 @@ function runbehat {
             # rerunbehat
             echo "a test failed"
         fi
+        return $exitcode
     else
         echo "running single behat test thread"
         $DIR/vendor/bin/behat --config $YMLDIR/behat.yml --tags $TAGS
