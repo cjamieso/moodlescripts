@@ -1,0 +1,74 @@
+#!/bin/bash
+
+export MOODLEVERSION=289
+export BRANCH=28
+
+if [ "$1" = "home" ];
+then
+    export DIR=/mnt/d/GitProjects
+elif [ "$1" = "work" ];
+then
+    export DIR=/mnt/c/Users/cjamieso/GitProjects
+else
+    echo "missing argument"
+    echo "usage: setup_wsl {home|work}"
+    exit 1
+fi
+
+# change set bell-style none in /etc/inputrc
+sudo sed -i 's/# set bell-style none/set bell-style none/g' /etc/inputrc
+
+# add line "set visualbell" to ~/.vimrc
+touch ~/.vimrc
+echo -e "set visualbell" >> ~/.vimrc
+
+# Setup Repos
+echo "Ensure that you have setup the SSH key for the github repo or this will fail."
+echo "id_rsa is 600, id_rsa.pub is 644, ~/.ssh is 700"
+
+# Add symlink for git projects
+cd ~/
+ln -s $DIR GitProjects
+# Setup moodle github repo
+cd GitProjects
+if ! (git clone git@github.com:cjamieso/moodle$MOODLEVERSION.git)
+    then
+    echo "Error cloning moodle repo: is SSH key setup?"
+    exit 1
+fi
+
+# Setup eclass unified
+cd ~/GitProjects
+if ! (git clone ssh://cjamieso@qa.srv.ualberta.ca:8022/eclass-unified)
+    then
+    echo "Error cloning eclass-unified: is SSH key setup and VPN running?"
+    exit 1
+fi
+cd eclass-unified
+git remote add eclass-development ssh://cjamieso@qa.ctl.ualberta.ca:8022/eclass-development
+git config remote.origin.push 'refs/heads/*:refs/for/TEST_$BRANCH'
+git config remote.eclass-development.push 'refs/heads/*:refs/heads/*'
+scp -p -P 8022 cjamieso@qa.ctl.ualberta.ca:hooks/commit-msg .git/hooks/
+git config --global rerere.enabled true
+git config branch.autosetupmerge always
+git config branch.autosetuprebase local
+git config push.default upstream
+git remote add craig ~/GitProjects/moodle$MOODLEVERSION
+git fetch craig
+
+# Setup moodlescripts project
+cd ~/GitProjects
+if ! (git clone git@github.com:cjamieso/moodlescripts.git)
+    then
+    echo "Error cloning moodlescripts: is SSH key setup?"
+    exit 1
+fi
+cd moodlescripts
+sudo cp po devel bfail difflast purgecaches rebase update_theme /usr/local/bin
+sudo cp .gitconfig.ubuntu ~/.gitconfig
+
+# Setup NodeJS & jshint
+curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+sudo apt-get install -y nodejs
+sudo npm install recess -g
+sudo npm install -g jshint

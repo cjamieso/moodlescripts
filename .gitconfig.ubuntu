@@ -1,0 +1,28 @@
+[user]
+	name = cjamieso
+	email = cjamieso@ualberta.ca
+[core]
+	edit = vim
+	editor = vim
+	trustctime = false
+[rerere]
+	enabled = true
+[push]
+	default = upstream
+[alias]
+	cob = !sh -c 'git checkout -b $1 origin/$1' -
+	cpt = cherry-pick --strategy-option theirs
+	cm = !git add --all && git commit
+	viewtree = log --all --graph --decorate --oneline
+	cbranch = !BRANCH="$(git name-rev --name-only HEAD)"&&git branch | grep -v "$BRANCH" | xargs git branch -D
+	check = !sh -c 'git diff --stat --no-index ~/GitProjects/moodle289/$1 ~/GitProjects/eclass-unified/$1' -
+	fulldiff = !sh -c 'git diff --stat $1~1 $1' -
+	filediff = !sh -c 'git diff $1~1 $1 -- $2' -
+[merge]
+	tool = vimdiff
+	conflictstyle = diff3
+
+[mergetool]
+	prompt = false
+	keepBackup = false
+
