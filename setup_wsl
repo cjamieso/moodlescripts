@@ -31,9 +31,9 @@ cd ~/
 ln -s $DIR GitProjects
 # Setup moodle github repo
 cd GitProjects
-if ! (git clone git@github.com:cjamieso/moodle$MOODLEVERSION.git)
+if ! (git clone git://github.com/cjamieso/moodle$MOODLEVERSION.git)
     then
-    echo "Error cloning moodle repo: is SSH key setup?"
+    echo "Error cloning moodle repo."
     exit 1
 fi
 
@@ -58,9 +58,9 @@ git fetch craig
 
 # Setup moodlescripts project
 cd ~/GitProjects
-if ! (git clone git@github.com:cjamieso/moodlescripts.git)
+if ! (git clone git://github.com/cjamieso/moodlescripts.git)
     then
-    echo "Error cloning moodlescripts: is SSH key setup?"
+    echo "Error cloning moodlescripts."
     exit 1
 fi
 cd moodlescripts
