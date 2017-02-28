@@ -18,6 +18,7 @@
 	check = !sh -c 'git diff --stat --no-index ~/GitProjects/moodle289/$1 ~/GitProjects/eclass-unified/$1' -
 	fulldiff = !sh -c 'git diff --stat $1~1 $1' -
 	filediff = !sh -c 'git diff $1~1 $1 -- $2' -
+	countlines = !sh -c 'git ls-files -- $1 | xargs cat | wc -l' -
 [merge]
 	tool = vimdiff
 	conflictstyle = diff3
