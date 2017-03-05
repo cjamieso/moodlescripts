@@ -1,31 +1,30 @@
 #!/bin/bash
 
 function runtests {
-	cd $DIR
 	if [ "$TESTTYPE" = "analytics" ];
 	then
 		echo "running report/analytics tests"
-		vendor/bin/phpunit -c report/analytics
+		export TESTPATH=report/analytics
 	elif [ "$TESTTYPE" = "mail" ];
 	then
 		echo "running blocks/course_message tests"
-		vendor/bin/phpunit -c blocks/course_message
+		export TESTPATH=blocks/course_message
 	elif [ "$TESTTYPE" = "sg" ];
 	then
 		echo "running blocks/skills_group tests"
-		vendor/bin/phpunit -c blocks/skills_group
+		export TESTPATH=blocks/skills_group
 	elif [ "$TESTTYPE" = "nn" ];
 	then
 		echo "running blocks/nurs_navigation tests"
-		vendor/bin/phpunit -c blocks/nurs_navigation
+		export TESTPATH=blocks/nurs_navigation
 	elif [ "TESTTYPE" = "labels" ];
 	then
 		echo "running course/format/collblct tests"
-		vendor/bin/phpunit -c course/format/collblct
+		export TESTPATH=course/format/collblct
 	else
 		echo "tests suite not found"
 	fi
-	cd -
+	cd $DIR && vendor/bin/phpunit -c $TESTPATH && cd -
 }
 
 # For travis builds, use its home dir, otherwise use /vagrant
@@ -47,8 +46,4 @@ then
 else
 	export TESTTYPE=$1
 	runtests
-    exitcode=${PIPESTATUS[0]}
-    echo $exitcode
-    echo "exit code"
-    echo $?
 fi
