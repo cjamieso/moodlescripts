@@ -47,4 +47,8 @@ then
 else
 	export TESTTYPE=$1
 	runtests
+    exitcode=${PIPESTATUS[0]}
+    echo $exitcode
+    echo "exit code"
+    echo $?
 fi
