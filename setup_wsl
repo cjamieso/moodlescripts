@@ -3,17 +3,24 @@
 export MOODLEVERSION=289
 export BRANCH=28
 
-if [ "$1" = "home" ];
+USER=`ls /mnt/c/Users | grep "cjami"`
+if [ -z $USER ];
 then
-    export DIR=/mnt/d/GitProjects
-elif [ "$1" = "work" ];
+    echo "user not correctly located"
+    return 1;
+fi
+if [ "$USER" = "cjamieso" ];
 then
     export DIR=/mnt/c/Users/cjamieso/GitProjects
+elif [ "$USER" = "cjami" ];
+then
+    export DIR=/mnt/d/GitProjects
 else
-    echo "missing argument"
-    echo "usage: setup_wsl {home|work}"
-    exit 1
+    echo "user not correctly located"
+    return 1;
 fi
+
+echo "Code folder set to: {$DIR}"
 
 # change set bell-style none in /etc/inputrc
 sudo sed -i 's/# set bell-style none/set bell-style none/g' /etc/inputrc

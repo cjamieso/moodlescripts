@@ -1,19 +1,17 @@
 #!/bin/bash
 
-if [ "$1" = "home" ];
-then
-    export DIR=cjami
-elif [ "$1" = "work" ];
-then
-    export DIR=cjamieso
-elif [ "$1" = "clean" ];
+if [ "$1" = "clean" ];
 then
     ssh vagrant rm -rf /behat_fail/*
-    exit 1
+    exit 0
 else
-    echo "missing argument"
-    echo "usage: bfail {home|work}"
-    exit 1
+    DIR=`ls /mnt/c/Users | grep "cjami"`
+    if [ -z $DIR ];
+    then
+        echo "user desktop not found"
+        exit 1
+    else
+        scp -rp vagrant:/behat_fail/* /mnt/c/Users/$DIR/Desktop
+        exit 0
+    fi
 fi
-
-scp -rp vagrant:/behat_fail/* /mnt/c/Users/$DIR/Desktop
