@@ -79,3 +79,10 @@ curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 sudo apt-get install -y nodejs
 sudo npm install recess -g
 sudo npm install -g jshint
+
+# Setup PHP5 + PHPCS
+sudo add-apt-repository ppa:ondrej/php
+sudo apt-get update
+sudo apt-get install php5.6
+sudo apt-get install php5.6-xml
+sudo apt-get install php-codesniffer
