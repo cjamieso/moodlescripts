@@ -19,7 +19,7 @@ class Wslphp(Linter):
     syntax = ('php', 'html')
     regex = (
         r'^(?:Parse|Fatal) (?P<error>error):(\s*(?P<type>parse|syntax) error,?)?\s*'
-        r'(?P<message>(?:unexpected \'(?P<near>[^\']+)\')?.*) in - on line (?P<line>\d+)'
+        r'(?P<message>(?:unexpected \'(?P<near>[^\']+)\')?.*) in .* on line (?P<line>\d+)'
     )
     executable = 'wslphp'
 
