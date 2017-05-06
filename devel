@@ -3,7 +3,7 @@
 if [ "$1" = "create" ];
 then
 	echo "creating DEVEL branch based on DEV_31"
-	git checkout ecalss-dev/DEV_31
+	git checkout eclass-dev/DEV_31
 elif [ "$1" = "delete" ];
 then
 	echo "deleting DEVEL branch"
