@@ -1,28 +1,23 @@
 #!/bin/bash
 
 function runtests {
-    if [ "$TESTTYPE" = "analytics" ];
-    then
+    if [ "$TESTTYPE" = "analytics" ]; then
         echo "Starting report/analytics tests"
         export TAGS=@report_analytics
         runbehat
-    elif [ "$TESTTYPE" = "sg" ];
-    then
+    elif [ "$TESTTYPE" = "sg" ]; then
         echo "Starting blocks/skills_group tests"
         export TAGS=@block_skills_group
         runbehat
-    elif [ "$TESTTYPE" = "mail" ];
-    then
+    elif [ "$TESTTYPE" = "mail" ]; then
         echo "Starting blocks/course_message tests"
         export TAGS=@block_course_message
         runbehat
-    elif [ "$TESTTYPE" = "wip" ];
-    then
+    elif [ "$TESTTYPE" = "wip" ]; then
         echo "Starting work-in-progress tests"
         export TAGS=@wip
         runbehat
-    elif [ "$TESTTYPE" = "labels" ];
-    then
+    elif [ "$TESTTYPE" = "labels" ]; then
         echo "Starting collapsed labels tests"
         export TAGS=@format_collblct
         runbehat
@@ -32,21 +27,22 @@ function runtests {
 }
 
 function runbehat {
-    if [ "$PARALLEL" -gt 1 ];
-    then
+    if [ "$PARALLELRUNS" -gt 1 ]; then
         echo "running behat tests in parallel"
         lsof | grep 4444
         lsof | grep 8000
-        # php $DIR/admin/tool/behat/cli/run.php --tags=$TAGS --rerun="rerun{runprocess}.txt" --replace="{runprocess}"
-        php $DIR/admin/tool/behat/cli/run.php --tags=$TAGS
+        PARALLELPERNODE=$(($PARALLELRUNS/$CI_NODE_TOTAL))
+        TORUN=$(($CI_NODE_INDEX*$PARALLELPERNODE))
+        FROMRUN=$(($TORUN-$PARALLELPERNODE+1))
+        php $DIR/admin/tool/behat/cli/run.php --tags=$TAGS --fromrun=$FROMRUN --torun=$TORUN --profile='firefox_{runprocess}' --replace='{runprocess}'
+        php $DIR/moodlescripts/get_behat_tests.php /home/travis/moodledata_behat $FROMRUN $TORUN ${PIPESTATUS[0]}
         exitcode=${PIPESTATUS[0]}
-        echo $exitcode
-        if [ "${exitcode}" -eq 1 ];
-        then
-            # rerunbehat
-            echo "a test failed"
+        if [ "${exitcode}" -gt 0 ]; then
+            echo "re-running tests"
+            rerunbehat
+        else
+            exit $exitcode
         fi
-        return $exitcode
     else
         echo "running single behat test thread"
         $DIR/vendor/bin/behat --config $YMLDIR/behat.yml --tags $TAGS
@@ -55,37 +51,32 @@ function runbehat {
 
 function rerunbehat {
     echo "re-running failed tests"
-    for ((i=1;i<=$PARALLEL;i+=1));
-    do
-        ls -l
-        rerunfile="rerun$i.txt"
-        echo $rerunfile
-        if [ -e "${rerunfile}" ];
-        then
-            if [ -s "${rerunfile}" ];
-            then
-                $DIR/vendor/bin/behat --config $YMLDIR/behat.yml --rerun $rerunfile
-                rm $rerunfile
+    if [ -s "rerun.txt" ]; then
+        cat rerun.txt
+        while read -r line || [[ -n "$line" ]];
+        do
+            ln -s $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/behatrun$line
+            $DIR/vendor/bin/behat --config $BEHAT_DATAROOT$line/behat/behat.yml --profile="firefox_$line" --tags=$TAGS --rerun
+            exitcode=${PIPESTATUS[0]}
+            if [ "${exitcode}" -gt 0 ]; then
+                exit $exitcode
             fi
-        fi
-    done;
+        done < "rerun.txt"
+    fi
 }
 
 # Check for parallel option and default to 1
-if [ -z "$PARALLEL" ];
-then
-    if [ -z "$2" ] ;
-    then
+if [ -z "$PARALLELRUNS" ]; then
+    if [ -z "$2" ] ; then
         echo "no option provided for parallel, using 1"
-        export PARALLEL=1
+        export PARALLELRUNS=1
     else
-        export PARALLEL=$2
+        export PARALLELRUNS=$2
     fi
 fi
 
 # For non-travis builds, start the jar and xvfb
-if [ -z "$TRAVIS_BUILD_DIR" ];
-then
+if [ -z "$TRAVIS_BUILD_DIR" ]; then
     export DIR=/vagrant
     export YMLDIR=/b_moodledata/behat
     start_selenium $PARALLEL
@@ -95,10 +86,8 @@ else
 fi
 
 # Use file for tests if it exists, otherwise use $1
-if [ -f "paths.txt" ];
-then
-    while read -r line || [[ -n "$line" ]];
-    do
+if [ -f "paths.txt" ]; then
+    while read -r line || [[ -n "$line" ]]; do
         export TESTTYPE=$line
         runtests
     done < "paths.txt"

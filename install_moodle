@@ -1,48 +1,33 @@
 #!/bin/bash
 
+DBUSER='postgres'
+
 # Set timzone for build.
 echo 'date.timezone = "America/Edmonton"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini;
-# Copy generic configuration in place.
+# Copy generic configuration in place
 cp config-dist.php config.php ;
 
 # Create the moodledata directory
-mkdir -p "$HOME"/roots/base
-chmod 777 "$HOME"/roots/base
+mkdir -p -m777 "$HOME"/moodledata
 
-# The database name and password.
-sed -i \
-  -e "s%= 'moodle'%= 'travis_ci_test'%" \
-  -e "s%= 'password'%= ''%" \
-  config.php ;
+# The database name and password
+sed -i s/\'moodle\'/\'$DBNAME\'/ config.php
+sed -i s/\'username\'/\'$DBUSER\'/ config.php
+sed -i s/\'password\'/\'$dbpass\'/ config.php
 
-# The wwwroot and dataroot.
+# The wwwroot and dataroot
 sed -i \
   -e "s%http://example.com/moodle%http://localhost%" \
-  -e "s%/home/example/moodledata%/home/travis/roots/base%" \
+  -e "s%/home/example/moodledata%/home/travis/moodledata%" \
   config.php ;
 
-if [ "$DB" = 'pgsql' ];
-then
-  # Postgres-specific setup.
-  sed -i \
-    -e "s%= 'username'%= 'postgres'%" \
-    config.php ;
+# This DB is used by phpunit
+psql -c "create database $DBNAME;" -U $DBUSER;
+# These DBs are used by behat
+for ((i=1;i<=$MAXDB;i+=1)); do
+  psql -c "create database $DBNAME$i;" -U $DBUSER;
+done;
 
-  psql -c 'CREATE DATABASE travis_ci_test;' -U postgres;
-fi
-
-if [ "$DB" = 'mysqli' ];
-then
-  # MySQL-specific setup.
-  sed -i \
-    -e "s%= 'pgsql'%= 'mysqli'%" \
-    -e "s%= 'username'%= 'travis'%" \
-    config.php;
-
-  mysql -u root -e 'SET GLOBAL innodb_file_format=barracuda;' ;
-  mysql -u root -e 'SET GLOBAL innodb_file_per_table=ON;' ;
-  mysql -e 'CREATE DATABASE travis_ci_test DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_bin;' ;
-fi
 
 sed -i "s%</ruleset>%<rule ref=\"moodle.Commenting.InlineComment.DocBlock\">\
 <severity>0</severity>\
