@@ -17,7 +17,7 @@ function runtests {
 	then
 		echo "running blocks/nurs_navigation tests"
 		export TESTPATH=blocks/nurs_navigation
-	elif [ "TESTTYPE" = "labels" ];
+	elif [ "$TESTTYPE" = "labels" ];
 	then
 		echo "running course/format/collblct tests"
 		export TESTPATH=course/format/collblct
