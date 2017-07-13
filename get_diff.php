@@ -71,7 +71,8 @@ foreach ($paths as $path) {
             // Do nothing.
     }
 }
-
-print_r($paths);
+if (count($paths) > 0) {
+    echo implode(" ", $paths);
+}
 
 fclose($file);

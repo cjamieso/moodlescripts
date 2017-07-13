@@ -1,32 +1,7 @@
 #!/bin/bash
 
-function runtests {
-    if [ "$TESTTYPE" = "analytics" ]; then
-        echo "Starting report/analytics tests"
-        export TAGS=@report_analytics
-        runbehat
-    elif [ "$TESTTYPE" = "sg" ]; then
-        echo "Starting blocks/skills_group tests"
-        export TAGS=@block_skills_group
-        runbehat
-    elif [ "$TESTTYPE" = "mail" ]; then
-        echo "Starting blocks/course_message tests"
-        export TAGS=@block_course_message
-        runbehat
-    elif [ "$TESTTYPE" = "wip" ]; then
-        echo "Starting work-in-progress tests"
-        export TAGS=@wip
-        runbehat
-    elif [ "$TESTTYPE" = "labels" ]; then
-        echo "Starting collapsed labels tests"
-        export TAGS=@format_collblct
-        runbehat
-    else
-        echo "Test type not found"
-    fi
-}
-
 function runbehat {
+    export TAGS=@$TESTTYPE
     if [ "$PARALLELRUNS" -gt 1 ]; then
         echo "running behat tests in parallel"
         lsof | grep 4444
@@ -65,16 +40,6 @@ function rerunbehat {
     fi
 }
 
-# Check for parallel option and default to 1
-if [ -z "$PARALLELRUNS" ]; then
-    if [ -z "$2" ] ; then
-        echo "no option provided for parallel, using 1"
-        export PARALLELRUNS=1
-    else
-        export PARALLELRUNS=$2
-    fi
-fi
-
 # For non-travis builds, start the jar and xvfb
 if [ -z "$TRAVIS_BUILD_DIR" ]; then
     export DIR=/vagrant
@@ -85,13 +50,17 @@ else
     export YMLDIR=/home/travis/roots/behatdata/behat
 fi
 
-# Use file for tests if it exists, otherwise use $1
-if [ -f "paths.txt" ]; then
-    while read -r line || [[ -n "$line" ]]; do
-        export TESTTYPE=$line
-        runtests
-    done < "paths.txt"
+# Check $1 for type of tests, otherwise use the diff.
+if [ -z "$1" ]; then
+    export PLUGINS=$(/usr/bin/php -f $DIR/moodlescripts/get_diff.php)
+    read -ra arr <<<"$PLUGINS"
+    for a in "${arr[@]}"; do
+        b=$(echo $a | sed 's,/,_,g')
+        c=$(echo $b | sed 's,course_format,format,g')
+        export TESTTYPE="$c"
+        runbehat
+    done
 else
     export TESTTYPE=$1
-    runtests
+    runbehat
 fi
