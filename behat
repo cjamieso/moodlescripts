@@ -15,7 +15,10 @@ function runbehat {
         if [ "${exitcode}" -gt 0 ]; then
             echo "re-running tests"
             rerunbehat
+            kill -9 $(lsof -ti tcp:4444)
+            exit $exitcode
         else
+            kill -9 $(lsof -ti tcp:4444)
             exit $exitcode
         fi
     else
@@ -34,6 +37,7 @@ function rerunbehat {
             $DIR/vendor/bin/behat --config $BEHAT_DATAROOT$line/behat/behat.yml --profile="firefox_$line" --tags=$TAGS --rerun
             exitcode=${PIPESTATUS[0]}
             if [ "${exitcode}" -gt 0 ]; then
+                kill -9 $(lsof -ti tcp:4444)
                 exit $exitcode
             fi
         done < "rerun.txt"
