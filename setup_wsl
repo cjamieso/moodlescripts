@@ -1,7 +1,7 @@
 #!/bin/bash
 
-export MOODLEVERSION=289
-export BRANCH=28
+export MOODLEVERSION=313
+export BRANCH=31
 
 USER=`ls /mnt/c/Users | grep "cjami"`
 if [ -z $USER ];
@@ -11,10 +11,10 @@ then
 fi
 if [ "$USER" = "cjamieso" ];
 then
-    export DIR=/mnt/c/Users/cjamieso/GitProjects
+    export DIR=/mnt/c/Users/cjamieso/gitprojects
 elif [ "$USER" = "cjami" ];
 then
-    export DIR=/mnt/d/GitProjects
+    export DIR=/mnt/d/gitprojects
 else
     echo "user not correctly located"
     return 1;
@@ -35,9 +35,9 @@ echo "id_rsa is 600, id_rsa.pub is 644, ~/.ssh is 700"
 
 # Add symlink for git projects
 cd ~/
-ln -s $DIR GitProjects
+ln -s $DIR gitprojects
 # Setup moodle github repo
-cd GitProjects
+cd gitprojects
 if ! (git clone git://github.com/cjamieso/moodle$MOODLEVERSION.git)
     then
     echo "Error cloning moodle repo."
@@ -45,26 +45,29 @@ if ! (git clone git://github.com/cjamieso/moodle$MOODLEVERSION.git)
 fi
 
 # Setup eclass unified
-cd ~/GitProjects
-if ! (git clone ssh://cjamieso@qa.srv.ualberta.ca:8022/eclass-unified)
+cd ~/gitprojects
+if ! (git clone ssh://git@bitbucket.org:cjamieso/eclass-craig.git
     then
-    echo "Error cloning eclass-unified: is SSH key setup and VPN running?"
+    echo "Error cloning eclass-craig: is SSH key setup?"
     exit 1
 fi
-cd eclass-unified
-git remote add eclass-development ssh://cjamieso@qa.ctl.ualberta.ca:8022/eclass-development
-git config remote.origin.push 'refs/heads/*:refs/for/TEST_$BRANCH'
-git config remote.eclass-development.push 'refs/heads/*:refs/heads/*'
-scp -p -P 8022 cjamieso@qa.ctl.ualberta.ca:hooks/commit-msg .git/hooks/
+cd eclass-craig
+git remote add eclass-dev ssh://git@bitbucket.org/uofa-eclass/eclass-dev.git
+git fetch eclass-dev
+git remote add upstream ssh://git@bitbucket.org/uofa-eclass/eclass.git
+# git remote add eclass-development ssh://cjamieso@qa.ctl.ualberta.ca:8022/eclass-development
+# git config remote.origin.push 'refs/heads/*:refs/for/TEST_$BRANCH'
+# git config remote.eclass-development.push 'refs/heads/*:refs/heads/*'
+# scp -p -P 8022 cjamieso@qa.ctl.ualberta.ca:hooks/commit-msg .git/hooks/
 git config --global rerere.enabled true
 git config branch.autosetupmerge always
 git config branch.autosetuprebase local
 git config push.default upstream
-git remote add craig ~/GitProjects/moodle$MOODLEVERSION
+git remote add craig ~/gitprojects/moodle$MOODLEVERSION
 git fetch craig
 
 # Setup moodlescripts project
-cd ~/GitProjects
+cd ~/gitprojects
 if ! (git clone git://github.com/cjamieso/moodlescripts.git)
     then
     echo "Error cloning moodlescripts."
