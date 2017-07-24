@@ -1,8 +1,11 @@
 #!/bin/bash
 
 function runbehat {
-    export TAGS=@$TESTTYPE
-    if [ "$PARALLELRUNS" -gt 1 ]; then
+    export TAGS=@$a
+    if [ -z "$PARALLELRUNS" ]; then
+        echo "running single behat test thread"
+        $DIR/vendor/bin/behat --config $YMLDIR/behat.yml --tags $TAGS
+    else
         echo "running behat tests in parallel"
         lsof | grep 4444
         lsof | grep 8000
@@ -21,9 +24,6 @@ function runbehat {
             kill -9 $(lsof -ti tcp:4444)
             exit $exitcode
         fi
-    else
-        echo "running single behat test thread"
-        $DIR/vendor/bin/behat --config $YMLDIR/behat.yml --tags $TAGS
     fi
 }
 
@@ -44,11 +44,18 @@ function rerunbehat {
     fi
 }
 
+# expects name to be in $a
+function translate_testtype {
+    a=$(echo $a | sed 's,/,_,g')
+    a=$(echo $a | sed 's,course_format,format,g')
+    export a=$(echo $a | sed 's,blocks,block,g')
+}
+
 # For non-travis builds, start the jar and xvfb
 if [ -z "$TRAVIS_BUILD_DIR" ]; then
     export DIR=/vagrant
     export YMLDIR=/b_moodledata/behat
-    start_selenium $PARALLEL
+    start_selenium 1
 else
     export DIR=$TRAVIS_BUILD_DIR
     export YMLDIR=/home/travis/roots/behatdata/behat
@@ -59,13 +66,11 @@ if [ -z "$1" ]; then
     export PLUGINS=$(/usr/bin/php -f $DIR/moodlescripts/get_diff.php)
     read -ra arr <<<"$PLUGINS"
     for a in "${arr[@]}"; do
-        b=$(echo $a | sed 's,/,_,g')
-        c=$(echo $b | sed 's,course_format,format,g')
-        d=$(echo $c | sed 's,blocks,block,g')
-        export TESTTYPE="$d"
+        translate_testtype
         runbehat
     done
 else
-    export TESTTYPE=$1
+    export a=$1
+    translate_testtype
     runbehat
 fi
