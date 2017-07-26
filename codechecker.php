@@ -24,7 +24,7 @@
 
 define('CLI_SCRIPT', true);
 $ignorenames = array('jquery.multiple.select.js', 'd3.js', 'd3.layout.cloud.js', 'd3cloud.js', 'd3tip.js');
-$ignoretypes = array('feature', 'png', 'PNG', 'xml', 'svg', 'txt', 'md', 'mustache');
+$ignoretypes = array('feature', 'png', 'PNG', 'xml', 'svg', 'txt', 'md', 'mustache', 'yml');
 
 require(dirname(__FILE__) . '/../config.php');
 require_once($CFG->libdir . '/clilib.php');
