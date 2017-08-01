@@ -3,17 +3,94 @@
 export MOODLEVERSION=313
 export BRANCH=31
 
+function setup_repos {
+    # Setup Repos
+    echo "Ensure that you have setup the SSH key for the github repo or this will fail."
+    echo "id_rsa is 600, id_rsa.pub is 644, ~/.ssh is 700"
+
+    # Add symlink for git projects
+    cd ~/
+    ln -s $DIR gitprojects
+    echo "[Adding development repo]"
+    # Setup moodle github repo
+    cd gitprojects
+    if ! (git clone git://github.com/cjamieso/moodle$MOODLEVERSION.git)
+        then
+        echo "Error cloning moodle repo."
+        exit 1
+    fi
+    cd moodle$MOODLEVERSION
+    git submodule update --init
+
+    echo "[Adding eclass repo]"
+    # Setup eclass-craig
+    cd ~/gitprojects
+    if ! (git clone ssh://git@bitbucket.org:cjamieso/eclass-craig.git
+        then
+        echo "Error cloning eclass-craig: is SSH key setup?"
+        exit 1
+    fi
+    cd eclass-craig
+    git remote add eclass-dev ssh://git@bitbucket.org/uofa-eclass/eclass-dev.git
+    git fetch eclass-dev
+    git remote add upstream ssh://git@bitbucket.org/uofa-eclass/eclass.git
+    git config branch.autosetupmerge always
+    git config branch.autosetuprebase local
+    git config push.default upstream
+    git remote add craig ~/gitprojects/moodle$MOODLEVERSION
+    git fetch craig
+
+    echo "[Adding moodlescripts]"
+    # Setup moodlescripts project
+    cd ~/gitprojects
+    if ! (git clone git://github.com/cjamieso/moodlescripts.git)
+        then
+        echo "Error cloning moodlescripts."
+        exit 1
+    fi
+}
+
+function setup_config {
+    echo "[Performing config]"
+    # change set bell-style none in /etc/inputrc
+    sudo sed -i 's/# set bell-style none/set bell-style none/g' /etc/inputrc
+
+    # add line "set visualbell" to ~/.vimrc
+    touch ~/.vimrc
+    echo -e "set visualbell" >> ~/.vimrc
+
+    cd moodlescripts
+    sudo cp po devel bfail difflast purgecaches rebase update_theme /usr/local/bin
+    sudo cp .gitconfig.ubuntu ~/.gitconfig
+    git config --global rerere.enabled true
+
+    echo "[Setting up nodejs and jshint]"
+    # Setup NodeJS & jshint
+    curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+    sudo npm install recess -g
+    sudo npm install -g jshint
+
+    echo "[Setting up php5 and phpcs]"
+    # Setup PHP5 + PHPCS
+    sudo add-apt-repository ppa:ondrej/php
+    sudo apt-get update
+    sudo apt-get install -y php5.6
+    sudo apt-get install -y php5.6-xml
+    sudo apt-get install -y php-codesniffer
+    cd ~/gitprojects/moodle$MOODLEVERSION/local/codechecker
+    sudo cp -R moodle /usr/share/php/PHP/CodeSniffer/Standards
+    sudo cp -R PHPCompatibility /usr/share/php/PHP/CodeSniffer/Standards
+}
+
 USER=`ls /mnt/c/Users | grep "cjami"`
-if [ -z $USER ];
-then
+if [ -z $USER ]; then
     echo "user not correctly located"
     return 1;
 fi
-if [ "$USER" = "cjamieso" ];
-then
+if [ "$USER" = "cjamieso" ]; then
     export DIR=/mnt/c/Users/cjamieso/gitprojects
-elif [ "$USER" = "cjami" ];
-then
+elif [ "$USER" = "cjami" ]; then
     export DIR=/mnt/d/gitprojects
 else
     echo "user not correctly located"
@@ -22,70 +99,10 @@ fi
 
 echo "Code folder set to: {$DIR}"
 
-# change set bell-style none in /etc/inputrc
-sudo sed -i 's/# set bell-style none/set bell-style none/g' /etc/inputrc
-
-# add line "set visualbell" to ~/.vimrc
-touch ~/.vimrc
-echo -e "set visualbell" >> ~/.vimrc
-
-# Setup Repos
-echo "Ensure that you have setup the SSH key for the github repo or this will fail."
-echo "id_rsa is 600, id_rsa.pub is 644, ~/.ssh is 700"
-
-# Add symlink for git projects
-cd ~/
-ln -s $DIR gitprojects
-# Setup moodle github repo
-cd gitprojects
-if ! (git clone git://github.com/cjamieso/moodle$MOODLEVERSION.git)
-    then
-    echo "Error cloning moodle repo."
-    exit 1
+if [ "$1" = "repos" ]; then
+    setup_repos
+elif [ "$1" = "config" ]; then
+    setup_config
+else
+    echo "valid options are: {repos|config}"
 fi
-
-# Setup eclass unified
-cd ~/gitprojects
-if ! (git clone ssh://git@bitbucket.org:cjamieso/eclass-craig.git
-    then
-    echo "Error cloning eclass-craig: is SSH key setup?"
-    exit 1
-fi
-cd eclass-craig
-git remote add eclass-dev ssh://git@bitbucket.org/uofa-eclass/eclass-dev.git
-git fetch eclass-dev
-git remote add upstream ssh://git@bitbucket.org/uofa-eclass/eclass.git
-# git remote add eclass-development ssh://cjamieso@qa.ctl.ualberta.ca:8022/eclass-development
-# git config remote.origin.push 'refs/heads/*:refs/for/TEST_$BRANCH'
-# git config remote.eclass-development.push 'refs/heads/*:refs/heads/*'
-# scp -p -P 8022 cjamieso@qa.ctl.ualberta.ca:hooks/commit-msg .git/hooks/
-git config --global rerere.enabled true
-git config branch.autosetupmerge always
-git config branch.autosetuprebase local
-git config push.default upstream
-git remote add craig ~/gitprojects/moodle$MOODLEVERSION
-git fetch craig
-
-# Setup moodlescripts project
-cd ~/gitprojects
-if ! (git clone git://github.com/cjamieso/moodlescripts.git)
-    then
-    echo "Error cloning moodlescripts."
-    exit 1
-fi
-cd moodlescripts
-sudo cp po devel bfail difflast purgecaches rebase update_theme /usr/local/bin
-sudo cp .gitconfig.ubuntu ~/.gitconfig
-
-# Setup NodeJS & jshint
-curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
-sudo apt-get install -y nodejs
-sudo npm install recess -g
-sudo npm install -g jshint
-
-# Setup PHP5 + PHPCS
-sudo add-apt-repository ppa:ondrej/php
-sudo apt-get update
-sudo apt-get install php5.6
-sudo apt-get install php5.6-xml
-sudo apt-get install php-codesniffer
