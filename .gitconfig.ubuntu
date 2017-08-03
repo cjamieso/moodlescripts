@@ -19,11 +19,15 @@
 	fulldiff = !sh -c 'git diff --stat $1~1 $1' -
 	filediff = !sh -c 'git diff $1~1 $1 -- $2' -
 	countlines = !sh -c 'git ls-files -- $1 | xargs cat | wc -l' -
+	unstage = !sh -c 'git reset HEAD $1' -
 [merge]
-	tool = vimdiff
+	tool = wslkdiff
 	conflictstyle = diff3
 
 [mergetool]
 	prompt = false
 	keepBackup = false
 
+[mergetool "wslkdiff"]
+	cmd = "kdiff3.exe $BASE $REMOTE $LOCAL -o $MERGED"
+	trustExitCode = true
