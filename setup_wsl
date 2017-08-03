@@ -25,7 +25,7 @@ function setup_repos {
     echo "[Adding eclass repo]"
     # Setup eclass-craig
     cd ~/gitprojects
-    if ! (git clone ssh://git@bitbucket.org:cjamieso/eclass-craig.git
+    if ! (git clone ssh://git@bitbucket.org:cjamieso/eclass-craig.git)
         then
         echo "Error cloning eclass-craig: is SSH key setup?"
         exit 1
@@ -52,6 +52,11 @@ function setup_repos {
 
 function setup_config {
     echo "[Performing config]"
+    cd ~/
+    SYMLINK=~/gitprojects
+    if [ ! -d "$SYMLINK" ]; then
+        ln -s $DIR gitprojects
+    fi
     # change set bell-style none in /etc/inputrc
     sudo sed -i 's/# set bell-style none/set bell-style none/g' /etc/inputrc
 
@@ -59,7 +64,7 @@ function setup_config {
     touch ~/.vimrc
     echo -e "set visualbell" >> ~/.vimrc
 
-    cd moodlescripts
+    cd ~/gitprojects/moodlescripts
     sudo cp po devel bfail difflast purgecaches rebase update_theme /usr/local/bin
     sudo cp .gitconfig.ubuntu ~/.gitconfig
     git config --global rerere.enabled true
