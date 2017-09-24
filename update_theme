@@ -7,16 +7,7 @@ then
     echo "user not correctly located"
     return 1;
 fi
-if [ "$USER" = "cjamieso" ];
-then
-    export DIR=/mnt/c/Users/cjamieso
-elif [ "$USER" = "cjami" ];
-then
-    export DIR=/mnt/d
-else
-    echo "user not correctly located"
-    return 1;
-fi
+export DIR=/mnt/c/Users/$USER
 
 echo "Code dir is: {$DIR}"
 echo "Make sure that node + recess are installed"
