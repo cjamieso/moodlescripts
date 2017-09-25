@@ -51,6 +51,7 @@ function translate_testtype {
     export a=$(echo $a | sed 's,blocks,block,g')
 }
 
+PHP=$(type -p php)
 # For non-travis builds, start the jar and xvfb
 if [ -z "$TRAVIS_BUILD_DIR" ]; then
     export DIR=/vagrant
@@ -63,7 +64,7 @@ fi
 
 # Check $1 for type of tests, otherwise use the diff.
 if [ -z "$1" ]; then
-    export PLUGINS=$(/usr/bin/php -f $DIR/moodlescripts/get_diff.php)
+    export PLUGINS=$($PHP -f $DIR/moodlescripts/get_diff.php)
     read -ra arr <<<"$PLUGINS"
     for a in "${arr[@]}"; do
         translate_testtype
