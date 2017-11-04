@@ -88,12 +88,12 @@ function setup_config {
     sudo cp -R PHPCompatibility /usr/share/php/PHP/CodeSniffer/Standards
 }
 
-USER=`ls /mnt/c/Users | grep "cjami"`
-if [ -z $USER ]; then
-    echo "user not correctly located"
+UNAME=`ls /mnt/c/Users | grep "^c"`
+if [ -z $UNAME ]; then
+    echo "UNAME not correctly located"
     return 1;
 fi
-export DIR=/mnt/c/Users/$USER/gitprojects
+export DIR=/mnt/c/Users/$UNAME/gitprojects
 
 echo "Code folder set to: {$DIR}"
 
