@@ -5,13 +5,12 @@ then
     ssh vagrant rm -rf /behat_fail/*
     exit 0
 else
-    DIR=`ls /mnt/c/Users | grep "cjami"`
-    if [ -z $DIR ];
-    then
-        echo "user desktop not found"
-        exit 1
-    else
-        scp -rp vagrant:/behat_fail/* /mnt/c/Users/$DIR/Desktop
-        exit 0
+    UNAME=`ls /mnt/c/Users | grep "^c"`
+    if [ -z $UNAME ]; then
+        echo "UNAME not correctly located"
+        return 1;
     fi
+    export DIR=/mnt/c/Users/$UNAME
+    scp -rp vagrant:/behat_fail/* $DIR/Desktop
+    exit 0
 fi
