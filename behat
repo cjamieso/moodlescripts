@@ -12,18 +12,18 @@ function runbehat {
         PARALLELPERNODE=$(($PARALLELRUNS/$CI_NODE_TOTAL))
         TORUN=$(($CI_NODE_INDEX*$PARALLELPERNODE))
         FROMRUN=$(($TORUN-$PARALLELPERNODE+1))
-        php $DIR/admin/tool/behat/cli/run.php --tags=$TAGS --fromrun=$FROMRUN --torun=$TORUN --profile='firefox_{runprocess}' --replace='{runprocess}'
-        php $DIR/moodlescripts/get_behat_tests.php /home/travis/moodledata_behat $FROMRUN $TORUN ${PIPESTATUS[0]}
-        exitcode=${PIPESTATUS[0]}
-        if [ "${exitcode}" -gt 0 ]; then
-            echo "re-running tests"
-            rerunbehat
-            kill -9 $(lsof -ti tcp:4444)
-            exit $exitcode
-        else
-            kill -9 $(lsof -ti tcp:4444)
-            exit $exitcode
-        fi
+        php $DIR/admin/tool/behat/cli/run.php --tags=$TAGS --fromrun=$FROMRUN --torun=$TORUN --profile='chrome_{runprocess}' --replace='{runprocess}'
+        # php $DIR/moodlescripts/get_behat_tests.php /home/travis/moodledata_behat $FROMRUN $TORUN ${PIPESTATUS[0]}
+        # exitcode=${PIPESTATUS[0]}
+        # if [ "${exitcode}" -gt 0 ]; then
+        #     echo "re-running tests"
+        #     rerunbehat
+        #     kill -9 $(lsof -ti tcp:4444)
+        #     exit $exitcode
+        # else
+        #     kill -9 $(lsof -ti tcp:4444)
+        #     exit $exitcode
+        # fi
     fi
 }
 
