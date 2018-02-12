@@ -71,10 +71,11 @@ function setup_config {
 
     echo "[Setting up nodejs and jshint]"
     # Setup NodeJS & jshint
-    curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+    curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
     sudo apt-get install -y nodejs
     sudo npm install recess -g
     sudo npm install -g jshint
+    sudo npm install -g grunt-cli
 
     echo "[Setting up php5 and phpcs]"
     # Setup PHP5 + PHPCS
