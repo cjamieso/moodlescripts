@@ -67,6 +67,8 @@ function setup_config {
     cd ~/gitprojects/moodlescripts
     sudo cp po devel bfail difflast purgecaches rebase update_theme /usr/local/bin
     sudo cp .gitconfig.ubuntu ~/.gitconfig
+    sudo cp mdocker.cmd tests.cmd phpu.cmd behat.cmd /mnt/c/Users/$UNAME
+    echo "Remember to add your user folder to the system path for the powershell scripts to run"
     git config --global rerere.enabled true
 
     echo "[Setting up nodejs and jshint]"
@@ -75,7 +77,10 @@ function setup_config {
     sudo apt-get install -y nodejs
     sudo npm install recess -g
     sudo npm install -g jshint
-    sudo npm install -g grunt-cli
+    cd ~/gitprojects/moodle$MOODLEVERSION
+    sudo npm install
+    # sudo npm install -g --no-bin-links grunt
+    # sudo npm install -g --no-bin-links grunt-cli
 
     echo "[Setting up php5 and phpcs]"
     # Setup PHP5 + PHPCS
