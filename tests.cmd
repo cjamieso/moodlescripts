@@ -19,11 +19,8 @@ IF /I "%1%"=="phpunit" (
     %DOCKERDIR%/bin/moodle-docker-compose exec webserver php admin/tool/phpunit/cli/init.php
     %DOCKERDIR%/bin/moodle-docker-compose exec webserver php admin/tool/phpunit/cli/util.php --buildcomponentconfigs
 )
-ELSE IF /I "%1%"=="behat" (
+IF /I "%1%"=="behat" (
     %DOCKERDIR%/bin/moodle-docker-compose exec webserver php admin/tool/behat/cli/init.php
-)
-ELSE (
-    ECHO "command not recognized, valid options are: {phpunit|behat}"
 )
 
 REM no option yet for behat parallel tests

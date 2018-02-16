@@ -39,7 +39,7 @@ IF /I "%1%"=="install" (
 )
 IF /I "%1%"=="post" (
     echo "changing post size"
-    docker.exe exec -it moodledocker_webserver_1 bash -c "ECHO -e 'post_max_size = 256M \nupload_max_filesize = 256M' > /usr/local/etc/php/php.ini"
+    docker.exe exec -it moodledocker_webserver_1 /bin/bash -c "echo -e 'post_max_size = 256M \nupload_max_filesize = 256M' > /usr/local/etc/php/php.ini"
 )
 
 ECHO "install at: http://localhost:8000/"
