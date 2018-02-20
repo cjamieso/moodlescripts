@@ -41,6 +41,10 @@ IF /I "%1%"=="post" (
     echo "changing post size"
     docker.exe exec -it moodledocker_webserver_1 /bin/bash -c "echo -e 'post_max_size = 256M \nupload_max_filesize = 256M' > /usr/local/etc/php/php.ini"
 )
+IF /I "%1%"=="cache" (
+    echo "purging caches"
+    %DOCKERDIR%/bin/moodle-docker-compose exec webserver php admin/cli/purge_caches.php
+)
 
 ECHO "install at: http://localhost:8000/"
 ECHO "faildumps at: http://localhost:8000/_/faildumps/"
