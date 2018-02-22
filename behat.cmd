@@ -14,7 +14,12 @@ IF "%1%"=="" (
 )
 
 SET DOCKERDIR=%MOODLE_DOCKER_WWWROOT%\moodle-docker
-%DOCKERDIR%/bin/moodle-docker-compose exec webserver php admin/tool/behat/cli/run.php --tags=@%1% %2%
+IF "%2%"=="rerun" (
+    %DOCKERDIR%/bin/moodle-docker-compose exec webserver php admin/tool/behat/cli/run.php --tags=@%1% --rerun
+)
+IF NOT "%2%"=="rerun" (
+    %DOCKERDIR%/bin/moodle-docker-compose exec webserver php admin/tool/behat/cli/run.php --tags=@%1%
+)
 
 REM no option for paralle running of tests
 REM should do auto-conversion of component/name to component_name

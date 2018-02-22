@@ -1,15 +1,13 @@
 @echo off
 setlocal enabledelayedexpansion
 
-call :convert %3 result
-set result3=!result!
 call :convert %5 result
 set result5=!result!
-bash -c "jshint !result3! %1 %4 !result5!"
+bash -c "~/gitprojects/moodle341/node_modules/.bin/eslint -c ~/gitprojects/moodle341/.eslintrc %1=%2 %3 %4 !result5!"
 exit
 
 :convert
-set fullpath=%1
+set fullpath=%5
 set letter=!fullpath:~0,1!
 set letter=!letter:C=c!
 set letter=!letter:D=d!
