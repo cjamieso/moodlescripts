@@ -9,7 +9,7 @@ IF NOT EXIST "%MOODLE_DOCKER_WWWROOT%" (
 )
 
 IF "%1%"=="" (
-    ECHO "missing phpunit component to run tests on"
+    ECHO "missing component to run phpunit tests on"
     EXIT /B 1
 )
 
