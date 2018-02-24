@@ -13,10 +13,11 @@ function runbehat {
         TORUN=$(($CI_NODE_INDEX*$PARALLELPERNODE))
         FROMRUN=$(($TORUN-$PARALLELPERNODE+1))
         php $DIR/admin/tool/behat/cli/run.php --tags=$TAGS --fromrun=$FROMRUN --torun=$TORUN --profile='firefox_{runprocess}' --replace='{runprocess}'
-        if [ "$MOODLEVERSION" = "313" ]; then
-            php $DIR/moodlescripts/get_behat_tests.php /home/travis/moodledata_behat $FROMRUN $TORUN ${PIPESTATUS[0]}
-        fi
         exitcode=${PIPESTATUS[0]}
+        if [ "$MOODLEVERSION" = "313" ]; then
+            php $DIR/moodlescripts/get_behat_tests.php /home/travis/moodledata_behat $FROMRUN $TORUN ${exitcode}
+            exitcode=${PIPESTATUS[0]}
+        fi
         if [ "${exitcode}" -gt 0 ]; then
             if [ "$MOODLEVERSION" = "313" ]; then
                 echo "re-running tests"
