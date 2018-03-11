@@ -8,6 +8,12 @@ IF NOT EXIST "%MOODLE_DOCKER_WWWROOT%" (
     EXIT /B 1
 )
 
+IF /I "%1%"=="drop" (
+    echo "starting containers"
+    %DOCKERDIR%/bin/moodle-docker-compose exec webserver php admin/tool/phpunit/cli/util.php --drop
+    EXIT 0
+)
+
 IF "%1%"=="" (
     ECHO "missing component to run phpunit tests on"
     EXIT /B 1

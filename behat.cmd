@@ -8,6 +8,12 @@ IF NOT EXIST "%MOODLE_DOCKER_WWWROOT%" (
     EXIT /B 1
 )
 
+IF /I "%1%"=="drop" (
+    echo "starting containers"
+    %DOCKERDIR%/bin/moodle-docker-compose exec webserver php admin/tool/behat/cli/util.php --drop
+    EXIT 0
+)
+
 IF "%1%"=="" (
     ECHO "missing component to run behat tests on"
     EXIT /B 1
