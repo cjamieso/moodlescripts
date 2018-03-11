@@ -1,10 +1,16 @@
 @echo off
 setlocal enabledelayedexpansion
 
-echo %*
-call :convert %1 result
-set result1=!result!
-bash -c "phpcs %2=%3 %4=%5 !result1!"
+IF /I "%3%"=="--standard" (
+    call :convert %6 result
+    set result1=!result!
+    wsl phpcs %1=%2 %3=%4 !result1!
+)
+IF /I "%5%"=="--standard" (
+    call :convert %4 result
+    set result1=!result!
+    wsl phpcs %1=%2 %5=%6 !result1!
+)
 exit
 
 :convert
