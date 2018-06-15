@@ -1,0 +1,27 @@
+Windows Registry Editor Version 5.00
+; Default color scheme
+; for Windows command prompt.
+
+; Values stored as 00-BB-GG-RR
+[HKEY_CURRENT_USER\Console]
+"ColorTable00"=dword:00240a30
+"ColorTable01"=dword:00a46534
+"ColorTable02"=dword:00069a4e
+"ColorTable03"=dword:009a9806
+"ColorTable04"=dword:000000cc
+"ColorTable05"=dword:007b5075
+"ColorTable06"=dword:0000a0c4
+"ColorTable07"=dword:00cfd7d3
+"ColorTable08"=dword:00535755
+"ColorTable09"=dword:00cf9f72
+"ColorTable10"=dword:0034e28a
+"ColorTable11"=dword:00e2e234
+"ColorTable12"=dword:002929ef
+"ColorTable13"=dword:00a87fad
+"ColorTable14"=dword:004fe9fc
+"ColorTable15"=dword:00eeeeee
+"FontFamily"=dword:00000036
+"FontWeight"=dword:00000190
+"FaceName"="Ubuntu Mono"
+"ScreenColors"=dword:0000000f
+"PopupColors"=dword:0000000f
