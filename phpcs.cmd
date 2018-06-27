@@ -2,23 +2,15 @@
 setlocal enabledelayedexpansion
 
 IF /I "%3%"=="--standard" (
-    call :convert %6 result
-    set result1=!result!
-    wsl phpcs %1=%2 %3=%4 !result1!
+    set winpath=%6
+    set winpath=!winpath:\=\\!
+    for /f "delims=" %%a in ('wsl wslpath !winpath!') do @set newpath=%%a
+    wsl phpcs %1=%2 %3=%4 !newpath!
 )
 IF /I "%5%"=="--standard" (
-    call :convert %4 result
-    set result1=!result!
-    wsl phpcs %1=%2 %5=%6 !result1!
+    set winpath=%4
+    set winpath=!winpath:\=\\!
+    for /f "delims=" %%a in ('wsl wslpath !winpath!') do @set newpath=%%a
+    wsl phpcs %1=%2 %5=%6 !newpath!
 )
 exit
-
-:convert
-set fullpath=%1
-set letter=!fullpath:~0,1!
-set letter=!letter:C=c!
-set letter=!letter:D=d!
-set filename=!fullpath:~2!
-set filename=!filename:\=/!
-set result=/mnt/!letter!!filename!
-goto:eof
