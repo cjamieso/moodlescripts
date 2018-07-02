@@ -17,7 +17,7 @@ SET DOCKERDIR=%MOODLE_DOCKER_WWWROOT%\moodle-docker
 
 IF /I "%1%"=="start" (
     echo "starting containers"
-    %DOCKERDIR%/bin/moodle-docker-compose up -d
+    %DOCKERDIR%/bin/moodle-docker-compose.cmd up -d
 )
 IF /I "%1%"=="selenium" (
     echo "wiping selenium"
@@ -27,15 +27,15 @@ IF /I "%1%"=="selenium" (
 )
 IF /I "%1%"=="stop" (
     echo "stopping containers"
-    %DOCKERDIR%/bin/moodle-docker-compose stop
+    %DOCKERDIR%/bin/moodle-docker-compose.cmd stop
 )
 IF /I "%1%"=="destroy" (
     echo "destroying containers"
-    %DOCKERDIR%/bin/moodle-docker-compose down
+    %DOCKERDIR%/bin/moodle-docker-compose.cmd down
 )
 IF /I "%1%"=="install" (
     echo "installing moodle"
-    %DOCKERDIR%/bin/moodle-docker-compose exec webserver php admin/cli/install_database.php --agree-license --fullname="Docker moodle" --shortname="docker_moodle" --adminpass="test" --adminemail="cjamieso@ualberta.ca"
+    %DOCKERDIR%/bin/moodle-docker-compose.cmd exec webserver php admin/cli/install_database.php --agree-license --fullname="Docker moodle" --shortname="docker_moodle" --adminpass="test" --adminemail="cjamieso@ualberta.ca"
 )
 IF /I "%1%"=="post" (
     echo "changing post size"
@@ -43,7 +43,7 @@ IF /I "%1%"=="post" (
 )
 IF /I "%1%"=="cache" (
     echo "purging caches"
-    %DOCKERDIR%/bin/moodle-docker-compose exec webserver php admin/cli/purge_caches.php
+    %DOCKERDIR%/bin/moodle-docker-compose.cmd exec webserver php admin/cli/purge_caches.php
 )
 
 ECHO "install at: http://localhost:8000/"

@@ -16,11 +16,11 @@ IF "%1%"=="" (
 SET DOCKERDIR=%MOODLE_DOCKER_WWWROOT%\moodle-docker
 
 IF /I "%1%"=="phpunit" (
-    %DOCKERDIR%/bin/moodle-docker-compose exec webserver php admin/tool/phpunit/cli/init.php
-    %DOCKERDIR%/bin/moodle-docker-compose exec webserver php admin/tool/phpunit/cli/util.php --buildcomponentconfigs
+    %DOCKERDIR%/bin/moodle-docker-compose.cmd exec webserver php admin/tool/phpunit/cli/init.php
+    %DOCKERDIR%/bin/moodle-docker-compose.cmd exec webserver php admin/tool/phpunit/cli/util.php --buildcomponentconfigs
 )
 IF /I "%1%"=="behat" (
-    %DOCKERDIR%/bin/moodle-docker-compose exec webserver php admin/tool/behat/cli/init.php
+    %DOCKERDIR%/bin/moodle-docker-compose.cmd exec webserver php admin/tool/behat/cli/init.php
 )
 
 REM no option yet for behat parallel tests

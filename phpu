@@ -1,24 +1,46 @@
 #!/bin/bash
 
+function docker {
+    if [ ! -d "$MOODLE_DOCKER_WWWROOT" ];
+    then
+        echo 'Error: $MOODLE_DOCKER_WWWROOT is not set or not an existing directory'
+        exit 1
+    fi
+    DOCKERDIR="${MOODLE_DOCKER_WWWROOT}/moodle-docker"
+    if [ "$1" = "drop" ];
+    then
+        echo "dropping tests"
+        $DOCKERDIR/bin/moodle-docker-compose exec webserver php admin/tool/phpunit/cli/util.php --drop
+        exit 0
+    fi
+
+    cd $DIR
+    $DOCKERDIR/bin//moodle-docker-compose exec webserver vendor/bin/phpunit -c $TESTTYPE
+    cd -
+}
+
+function runphpunit {
+    # For travis builds, use its home dir, otherwise use /vagrant
+    if [ -z "$TRAVIS_BUILD_DIR" ];
+    then
+        export DIR=/vagrant
+        docker
+    else
+        export DIR=$TRAVIS_BUILD_DIR
+        cd $DIR && vendor/bin/phpunit -c $TESTTYPE && cd -
+    fi
+}
+
 PHP=$(type -p php)
-
-# For travis builds, use its home dir, otherwise use /vagrant
-if [ -z "$TRAVIS_BUILD_DIR" ];
-then
-    export DIR=/vagrant
-else
-    export DIR=$TRAVIS_BUILD_DIR
-fi
-
 # Check $1 for type of tests, otherwise use the diff.
 if [ -z "$1" ]; then
     export PLUGINS=$($PHP -f $DIR/moodlescripts/get_diff.php)
     read -ra arr <<<"$PLUGINS"
     for a in "${arr[@]}"; do
         export TESTTYPE="$a"
-        cd $DIR && vendor/bin/phpunit -c $TESTTYPE && cd -
+        runphpunit
     done
 else
     export TESTTYPE=$1
-    cd $DIR && vendor/bin/phpunit -c $TESTTYPE && cd -
+    runphpunit
 fi

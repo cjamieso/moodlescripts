@@ -1,0 +1,67 @@
+#!/bin/bash
+
+function exit_message {
+    echo "install at: http://localhost:8000/"
+    echo "faildumps at: http://localhost:8000/_/faildumps/"
+    exit 0
+}
+
+if [ -z "$1" ]; then
+    echo "missing argument"
+    echo "usage: mdocker {start|selenium|stop|destroy|install|post|caches}"
+    exit 1
+fi
+
+if [ ! -d "$MOODLE_DOCKER_WWWROOT" ];
+then
+    echo 'Error: $MOODLE_DOCKER_WWWROOT is not set or not an existing directory'
+    exit 1
+fi
+
+DOCKERDIR="${MOODLE_DOCKER_WWWROOT}/moodle-docker"
+
+if [ "$1" = "start" ]; then
+    echo "starting containers"
+    $DOCKERDIR/bin/moodle-docker-compose up -d
+    exit_message
+fi
+
+if [ "$1" = "selenium" ]; then
+    echo "wiping selenium"
+    # fix this part for linux
+    ID='$( docker ps -a --filter "name=selenium" --format "{{.ID}}" )'
+    # for /f "delims=" %%i in ('docker ps -a --filter "name=selenium" --format "{{.ID}}"') do set ID=%%i
+    docker stop $ID
+    docker rm $ID
+    exit_message
+fi
+
+if [ "$1" = "stop" ]; then
+    echo "stopping containers"
+    $DOCKERDIR/bin/moodle-docker-compose stop
+    exit_message
+fi
+
+if [ "$1" = "destroy" ]; then
+    echo "destroying containers"
+    $DOCKERDIR/bin/moodle-docker-compose down
+    exit_message
+fi
+
+if [ "$1" = "install" ]; then
+    echo "installing moodle"
+    $DOCKERDIR/bin/moodle-docker-compose exec webserver php admin/cli/install_database.php --agree-license --fullname="Docker moodle" --shortname="docker_moodle" --adminpass="test" --adminemail="cjamieso@ualberta.ca"
+    exit_message
+fi
+
+if [ "$1" = "post" ]; then
+    echo "changing post size"
+    docker exec -it moodledocker_webserver_1 /bin/bash -c "echo -e 'post_max_size = 256M \nupload_max_filesize = 256M' > /usr/local/etc/php/php.ini"
+    exit_message
+fi
+
+if [ "$1" = "caches" ]; then
+    echo "purging caches"
+    $DOCKERDIR/bin/moodle-docker-compose.cmd exec webserver php admin/cli/purge_caches.php
+    exit_message
+fi

@@ -7,27 +7,28 @@ else
     export PARALLEL=$2
 fi
 
+if [ ! -d "$MOODLE_DOCKER_WWWROOT" ];
+then
+    echo 'Error: $MOODLE_DOCKER_WWWROOT is not set or not an existing directory'
+    exit 1
+fi
+DOCKERDIR="${MOODLE_DOCKER_WWWROOT}/moodle-docker"
+
 if [ "$1" = "phpunit" ];
 then
 	echo "resetting phpunit tests"
-	php /vagrant/admin/tool/phpunit/cli/init.php
-    php /vagrant/admin/tool/phpunit/cli/util.php --buildcomponentconfigs
+    $DOCKERDIR/bin/moodle-docker-compose exec webserver php admin/tool/phpunit/cli/init.php
+    $DOCKERDIR/bin/moodle-docker-compose exec webserver php admin/tool/phpunit/cli/util.php --buildcomponentconfigs
 elif [ "$1" = "behat" ];
 then
 	echo "resetting behat tests"
     if [ "$PARALLEL" -gt 1 ];
     then
-        php /vagrant/admin/tool/behat/cli/init.php --parallel=$PARALLEL
+        $DOCKERDIR/bin/moodle-docker-compose exec webserver php admin/tool/behat/cli/init.php --parallel=$PARALLEL
     else
-        php /vagrant/admin/tool/behat/cli/init.php
+        $DOCKERDIR/bin/moodle-docker-compose exec webserver php admin/tool/behat/cli/init.php
     fi
-elif [ "$1" = "phpmd" ];
-then
-    echo "configuring phpmd"
-    cd /vagrant/phpmd
-    git submodule update --init --recursive
-    composer install
 else
-	echo "incorrect option given, use either phpunit|behat|phpmd"
+	echo "incorrect option given, use either phpunit|behat"
 fi
 
