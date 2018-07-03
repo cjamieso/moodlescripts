@@ -80,7 +80,7 @@ function setup_config {
     curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
     sudo apt-get install -y nodejs
     cd ~/gitprojects/moodle$MOODLEVERSION
-    sudo npm install
+    npm install
 
     echo "[Setting up php7 and phpcs]"
     # Setup PHP7.1 + PHPCS

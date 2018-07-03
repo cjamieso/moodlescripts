@@ -28,9 +28,6 @@ php -S localhost:8000 > /dev/null 2>&1 &
 php admin/tool/behat/cli/init.php -j=$PARALLELRUNS -m=$PARALLELPERNODE --fromrun=$FROMRUN --torun=$TORUN
 
 # Setup grunt and build the min sources.
-if [ "$MOODLEVERSION" = "313" ] || [ "$MOODLEVERSION" = "341" ];
-then
-    npm install --no-spin
-    npm install --no-spin -g grunt-cli
-    grunt amd
-fi
+npm install --no-spin
+npm install --no-spin -g grunt-cli
+grunt amd
