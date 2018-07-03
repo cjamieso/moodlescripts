@@ -49,19 +49,6 @@ function travis {
     fi
 }
 
-function runbehat {
-    # For non-travis builds, run commands in docker
-    if [ -z "$TRAVIS_BUILD_DIR" ]; then
-        export DIR=/vagrant
-        export YMLDIR=/b_moodledata/behat
-        docker
-    else
-        export DIR=$TRAVIS_BUILD_DIR
-        export YMLDIR=/home/travis/roots/behatdata/behat
-        travis
-    fi
-}
-
 # expects name to be in $a
 function translate_testtype {
     a=$(echo $a | sed 's,/,_,g')
@@ -69,17 +56,31 @@ function translate_testtype {
     export a=$(echo $a | sed 's,blocks,block,g')
 }
 
-PHP=$(type -p php)
-# Check $1 for type of tests, otherwise use the diff.
-if [ -z "$1" ]; then
-    export PLUGINS=$($PHP -f $DIR/moodlescripts/get_diff.php)
-    read -ra arr <<<"$PLUGINS"
-    for a in "${arr[@]}"; do
+function get_test {
+    # Check $1 for type of tests, otherwise use the diff.
+    if [ -z "$1" ]; then
+        export PLUGINS=$($PHP -f $DIR/moodlescripts/get_diff.php)
+        read -ra arr <<<"$PLUGINS"
+        for a in "${arr[@]}"; do
+            translate_testtype
+        done
+    else
+        export a=$1
         translate_testtype
-        runbehat
-    done
+    fi
+}
+
+export PHP=$(type -p php)
+# For non-travis builds, run commands in docker
+if [ -z "$TRAVIS_BUILD_DIR" ]; then
+    export DIR=/vagrant
+    export YMLDIR=/b_moodledata/behat
+    get_test
+    docker
 else
-    export a=$1
-    translate_testtype
-    runbehat
+    export DIR=$TRAVIS_BUILD_DIR
+    export YMLDIR=/home/travis/roots/behatdata/behat
+    get_test
+    travis
 fi
+

@@ -19,28 +19,28 @@ function docker {
     cd -
 }
 
-function runphpunit {
-    # For travis builds, use its home dir, otherwise use /vagrant
-    if [ -z "$TRAVIS_BUILD_DIR" ];
-    then
-        export DIR=/vagrant
-        docker
+function get_test {
+    # Check $1 for type of tests, otherwise use the diff.
+    if [ -z "$1" ]; then
+        export PLUGINS=$($PHP -f $DIR/moodlescripts/get_diff.php)
+        read -ra arr <<<"$PLUGINS"
+        for a in "${arr[@]}"; do
+            export TESTTYPE="$a"
+        done
     else
-        export DIR=$TRAVIS_BUILD_DIR
-        cd $DIR && vendor/bin/phpunit -c $TESTTYPE && cd -
+        export TESTTYPE=$1
     fi
 }
 
-PHP=$(type -p php)
-# Check $1 for type of tests, otherwise use the diff.
-if [ -z "$1" ]; then
-    export PLUGINS=$($PHP -f $DIR/moodlescripts/get_diff.php)
-    read -ra arr <<<"$PLUGINS"
-    for a in "${arr[@]}"; do
-        export TESTTYPE="$a"
-        runphpunit
-    done
+export PHP=$(type -p php)
+# For travis builds, use its home dir, otherwise use /vagrant
+if [ -z "$TRAVIS_BUILD_DIR" ];
+then
+    export DIR=/vagrant
+    get_test
+    docker
 else
-    export TESTTYPE=$1
-    runphpunit
+    export DIR=$TRAVIS_BUILD_DIR
+    get_test
+    cd $DIR && vendor/bin/phpunit -c $TESTTYPE && cd -
 fi
