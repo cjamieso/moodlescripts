@@ -39,7 +39,11 @@ IF /I "%1%"=="install" (
 )
 IF /I "%1%"=="post" (
     echo "changing post size"
-    docker.exe exec -it moodledocker_webserver_1 /bin/bash -c "echo -e 'post_max_size = 256M \nupload_max_filesize = 256M' > /usr/local/etc/php/php.ini"
+    docker.exe exec -it moodled-ocker_webserver_1 /bin/bash -c "echo -e 'post_max_size = 256M \nupload_max_filesize = 256M' > /usr/local/etc/php/php.ini"
+)
+IF /I "%1%"=="composer" (
+    echo "setting up composer in /usr/local/bin"
+    docker.exe exec -it moodle-docker_webserver_1 /bin/bash -c "cp composer.phar /usr/local/bin/composer"
 )
 IF /I "%1%"=="cache" (
     echo "purging caches"
