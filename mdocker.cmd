@@ -39,15 +39,23 @@ IF /I "%1%"=="install" (
 )
 IF /I "%1%"=="post" (
     echo "changing post size"
-    docker.exe exec -it moodled-ocker_webserver_1 /bin/bash -c "echo -e 'post_max_size = 256M \nupload_max_filesize = 256M' > /usr/local/etc/php/php.ini"
+    %DOCKERDIR%/bin/moodle-docker-compose.cmd webserver /bin/bash -c "echo -e 'post_max_size = 256M \nupload_max_filesize = 256M' > /usr/local/etc/php/php.ini"
 )
 IF /I "%1%"=="composer" (
     echo "setting up composer in /usr/local/bin"
-    docker.exe exec -it moodle-docker_webserver_1 /bin/bash -c "cp composer.phar /usr/local/bin/composer"
+    %DOCKERDIR%/bin/moodle-docker-compose.cmd exec webserver /bin/bash -c "cp composer.phar /usr/local/bin/composer"
 )
 IF /I "%1%"=="cache" (
     echo "purging caches"
     %DOCKERDIR%/bin/moodle-docker-compose.cmd exec webserver php admin/cli/purge_caches.php
+)
+IF /I "%1%"=="rsync" (
+    echo "installing rsync on webserver"
+    %DOCKERDIR%/bin/moodle-docker-compose.cmd exec webserver /bin/bash -c "apt-get update && apt-get -y install rsync"
+)
+IF /I "%1%"=="sync" (
+    echo "syncing files on webserver - this may take some time at first"
+    %DOCKERDIR%/bin/moodle-docker-compose.cmd exec webserver /bin/bash -c "rsync -aqr --chmod=777 /var/html /var/www/"
 )
 
 ECHO "install at: http://localhost:8000/"
