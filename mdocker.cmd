@@ -41,10 +41,6 @@ IF /I "%1%"=="post" (
     echo "changing post size"
     %DOCKERDIR%/bin/moodle-docker-compose.cmd webserver /bin/bash -c "echo -e 'post_max_size = 256M \nupload_max_filesize = 256M' > /usr/local/etc/php/php.ini"
 )
-IF /I "%1%"=="composer" (
-    echo "setting up composer in /usr/local/bin"
-    %DOCKERDIR%/bin/moodle-docker-compose.cmd exec webserver /bin/bash -c "cp composer.phar /usr/local/bin/composer"
-)
 IF /I "%1%"=="cache" (
     echo "purging caches"
     %DOCKERDIR%/bin/moodle-docker-compose.cmd exec webserver php admin/cli/purge_caches.php

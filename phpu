@@ -1,46 +1,74 @@
 #!/bin/bash
 
-function docker {
-    if [ ! -d "$MOODLE_DOCKER_WWWROOT" ];
-    then
-        echo 'Error: $MOODLE_DOCKER_WWWROOT is not set or not an existing directory'
-        exit 1
-    fi
-    DOCKERDIR="${MOODLE_DOCKER_WWWROOT}/moodle-docker"
-    if [ "$1" = "drop" ];
-    then
-        echo "dropping tests"
-        $DOCKERDIR/bin/moodle-docker-compose exec webserver php admin/tool/phpunit/cli/util.php --drop
-        exit 0
-    fi
+while getopts ":t:doi" arg; do
+  case $arg in
+    t)
+      t=1
+      tags="$OPTARG"
+      ;;
+    d)
+      drop=1
+      ;;
+    o)
+      output=1
+      ;;
+    i)
+      init=1
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG". >&2
+      ;;
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
+      ;;
+  esac
+done
 
-    cd $DIR
-    $DOCKERDIR/bin//moodle-docker-compose exec webserver vendor/bin/phpunit -c $TESTTYPE
-    cd -
-}
-
-function get_test {
-    # Check $1 for type of tests, otherwise use the diff.
-    if [ -z "$1" ]; then
-        export PLUGINS=$($PHP -f $DIR/moodlescripts/get_diff.php)
-        read -ra arr <<<"$PLUGINS"
-        for a in "${arr[@]}"; do
-            export TESTTYPE="$a"
-        done
-    else
-        export TESTTYPE=$1
-    fi
+# expects name to be in $a
+function translate_testtype {
+    a=$(echo $a | sed 's,/,_,g')
+    a=$(echo $a | sed 's,course_format,format,g')
+    export a=$(echo $a | sed 's,blocks,block,g')
 }
 
 export PHP=$(type -p php)
+if [ "$drop" = 1 ];
+then
+    command="php admin/tool/phpunit/cli/util.php --drop"
+elif [ "$init" = 1 ];
+then
+    command="php admin/tool/phpunit/cli/init.php"
+else
+    command="vendor/bin/phpunit -c ${a}"
+  # check for tests specified
+  if [ "$t" -ne 1 ];
+  then
+     export PLUGINS=$($PHP -f $DIR/moodlescripts/get_diff.php)
+     read -ra arr <<<"$PLUGINS"
+     for a in "${arr[@]}"; do
+         translate_testtype
+     done
+  else
+     export a=$tags
+     translate_testtype
+  fi
+fi
+
 # For travis builds, use its home dir, otherwise use /vagrant
 if [ -z "$TRAVIS_BUILD_DIR" ];
 then
     export DIR=/vagrant
-    get_test
-    docker
+    command="exec webserver ${command} ${a}"
+    if [ "$output" = 1 ];
+    then
+        echo "${command}"
+    else
+        DOCKERDIR="${MOODLE_DOCKER_WWWROOT}/moodle-docker"
+        eval "$DOCKERDIR/bin/moodle-docker-compose ${command}"
+    fi
 else
     export DIR=$TRAVIS_BUILD_DIR
-    get_test
-    cd $DIR && vendor/bin/phpunit -c $TESTTYPE && cd -
+    cd $DIR
+    eval ${command} ${a}
+    cd -
 fi

@@ -7,10 +7,19 @@ IF NOT EXIST "%MOODLE_DOCKER_WWWROOT%" (
     ECHO Error: MOODLE_DOCKER_WWWROOT is not set or not an existing directory
     EXIT /B 1
 )
+SET DOCKERDIR=%MOODLE_DOCKER_WWWROOT%\moodle-docker
 
 IF /I "%1%"=="drop" (
     echo "dropping tests"
-    %DOCKERDIR%/bin/moodle-docker-compose.cmd exec webserver php admin/tool/behat/cli/util.php --drop
+    for /f "delims=" %%a in ('wsl behat -d -o') do @set command=%%a
+    %DOCKERDIR%/bin/moodle-docker-compose.cmd !command!
+    EXIT 0
+)
+
+IF /I "%1%"=="init" (
+    echo "initializing behat tests"
+    for /f "delims=" %%a in ('wsl behat -i -o') do @set command=%%a
+    %DOCKERDIR%/bin/moodle-docker-compose.cmd !command!
     EXIT 0
 )
 
@@ -19,14 +28,12 @@ IF "%1%"=="" (
     EXIT /B 1
 )
 
-SET DOCKERDIR=%MOODLE_DOCKER_WWWROOT%\moodle-docker
 IF "%2%"=="rerun" (
-    %DOCKERDIR%/bin/moodle-docker-compose.cmd exec webserver php admin/tool/behat/cli/run.php --tags=@%1% --rerun
+    for /f "delims=" %%a in ('wsl behat -t %1 -r -o') do @set command=%%a
 )
 IF NOT "%2%"=="rerun" (
-    %DOCKERDIR%/bin/moodle-docker-compose.cmd exec webserver php admin/tool/behat/cli/run.php --tags=@%1%
+    for /f "delims=" %%a in ('wsl behat -t %1 -o') do @set command=%%a
 )
+%DOCKERDIR%/bin/moodle-docker-compose.cmd !command!
 
 REM no option for paralle running of tests
-REM should do auto-conversion of component/name to component_name
-REM the course format tests are tricky - I used sed for this in linux

@@ -1,28 +1,77 @@
 #!/bin/bash
 
-function docker {
-    export TAGS=@$a
-    if [ ! -d "$MOODLE_DOCKER_WWWROOT" ];
+while getopts ":t:rdoi" arg; do
+  case $arg in
+    t)
+      t=1
+      tags="$OPTARG"
+      ;;
+    r)
+      rerun=1
+      ;;
+    d)
+      drop=1
+      ;;
+    i)
+      init=1
+      ;;
+    o)
+      output=1
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG". >&2
+      ;;
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
+      ;;
+  esac
+done
+
+# echo command if output is set, otherwise run command
+function process_command {
+    if [ "$output" == 1 ];
     then
-        echo 'Error: $MOODLE_DOCKER_WWWROOT is not set or not an existing directory'
-        exit 1
-    fi
-    DOCKERDIR="${MOODLE_DOCKER_WWWROOT}/moodle-docker"
-    if [ "$1" = "drop" ];
-    then
-        echo "dropping tests"
-        $DOCKERDIR/bin/moodle-docker-compose exec webserver php admin/tool/behat/cli/util.php --drop
+        echo $command
+        exit 0
+    else
+        DOCKERDIR="${MOODLE_DOCKER_WWWROOT}/moodle-docker"
+        eval "$DOCKERDIR/bin/moodle-docker-compose ${command}"
         exit 0
     fi
 
-    if [ "$2" = "rerun" ];
-    then
-        $DOCKERDIR/bin/moodle-docker-compose exec webserver php admin/tool/behat/cli/run.php --tags=$TAGS --rerun
-        exit 0
-    fi
-    $DOCKERDIR/bin/moodle-docker-compose exec webserver php admin/tool/behat/cli/run.php --tags=$TAGS
 }
 
+# check for dropping of tests first
+if [ "$drop" == 1 ];
+then
+    command="exec webserver php admin/tool/behat/cli/util.php --drop"
+    process_command
+elif [ "$init" == 1 ];
+then
+    # TODO: this should also check for parallel
+    command="exec webserver php admin/tool/behat/cli/init.php"
+    process_command
+fi
+
+# expects name to be in $a
+function translate_testtype {
+    a=$(echo $a | sed 's,/,_,g')
+    a=$(echo $a | sed 's,course_format,format,g')
+    export a=$(echo $a | sed 's,blocks,block,g')
+}
+
+# docker based tests
+function docker {
+    command="exec webserver php admin/tool/behat/cli/run.php --tags=@$a"
+
+    if [ "$rerun" = 1 ];
+    then
+        $command="${command} --rerun"
+    fi
+    process_command
+}
+
+# travis based tests
 function travis {
     export TAGS=@$a
     if [ -z "$PARALLELRUNS" ]; then
@@ -49,38 +98,28 @@ function travis {
     fi
 }
 
-# expects name to be in $a
-function translate_testtype {
-    a=$(echo $a | sed 's,/,_,g')
-    a=$(echo $a | sed 's,course_format,format,g')
-    export a=$(echo $a | sed 's,blocks,block,g')
-}
-
-function get_test {
-    # Check $1 for type of tests, otherwise use the diff.
-    if [ -z "$1" ]; then
-        export PLUGINS=$($PHP -f $DIR/moodlescripts/get_diff.php)
-        read -ra arr <<<"$PLUGINS"
-        for a in "${arr[@]}"; do
-            translate_testtype
-        done
-    else
-        export a=$1
+# check for tests specified
+if [ "$t" -ne 1 ];
+then
+    export PLUGINS=$($PHP -f $DIR/moodlescripts/get_diff.php)
+    read -ra arr <<<"$PLUGINS"
+    for a in "${arr[@]}"; do
         translate_testtype
-    fi
-}
+    done
+else
+    export a=$tags
+    translate_testtype
+fi
 
+#now run tests
 export PHP=$(type -p php)
 # For non-travis builds, run commands in docker
 if [ -z "$TRAVIS_BUILD_DIR" ]; then
     export DIR=/vagrant
     export YMLDIR=/b_moodledata/behat
-    get_test
     docker
 else
     export DIR=$TRAVIS_BUILD_DIR
     export YMLDIR=/home/travis/roots/behatdata/behat
-    get_test
     travis
 fi
-

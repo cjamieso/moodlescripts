@@ -69,7 +69,7 @@ function setup_config {
     echo -e "set visualbell" >> ~/.vimrc
 
     cd ~/gitprojects/moodlescripts
-    sudo cp po devel bfail difflast purgecaches rebase update_theme /usr/local/bin
+    sudo cp po devel difflast rebase update_theme behat phpu /usr/local/bin
     cp .gitconfig.ubuntu ~/.gitconfig
     sudo cp mdocker.cmd tests.cmd phpu.cmd behat.cmd /mnt/c/Users/$UNAME
     echo "Remember to add your user folder to the system path for the powershell scripts to run"
