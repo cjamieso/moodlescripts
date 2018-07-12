@@ -20,8 +20,8 @@ IF /I "%1%"=="-i" (
     echo "initializing phpunit tests"
     for /f "delims=" %%a in ('wsl phpu -i -o') do @set command=%%a
     %DOCKERDIR%/bin/moodle-docker-compose.cmd !command!
-    REM find way to have the phpu script output this command as well
-    %DOCKERDIR%/bin/moodle-docker-compose.cmd exec webserver php admin/tool/phpunit/cli/util.php --buildcomponentconfigs
+    for /f "delims=" %%a in ('wsl phpu -b -o') do @set command=%%a
+    %DOCKERDIR%/bin/moodle-docker-compose.cmd !command!
     EXIT 0
 )
 
