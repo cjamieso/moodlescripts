@@ -9,14 +9,14 @@ IF NOT EXIST "%MOODLE_DOCKER_WWWROOT%" (
 )
 SET DOCKERDIR=%MOODLE_DOCKER_WWWROOT%\moodle-docker
 
-IF /I "%1%"=="drop" (
+IF /I "%1%"=="-d" (
     echo "dropping tests"
     for /f "delims=" %%a in ('wsl behat -d -o') do @set command=%%a
     %DOCKERDIR%/bin/moodle-docker-compose.cmd !command!
     EXIT 0
 )
 
-IF /I "%1%"=="init" (
+IF /I "%1%"=="-i" (
     echo "initializing behat tests"
     for /f "delims=" %%a in ('wsl behat -i -o') do @set command=%%a
     %DOCKERDIR%/bin/moodle-docker-compose.cmd !command!
@@ -28,12 +28,12 @@ IF "%1%"=="" (
     EXIT /B 1
 )
 
-IF "%2%"=="rerun" (
-    for /f "delims=" %%a in ('wsl behat -t %1 -r -o') do @set command=%%a
+IF "%1%"=="-r" (
+    for /f "delims=" %%a in ('wsl behat -t %2 -r -o') do @set command=%%a
 )
-IF NOT "%2%"=="rerun" (
-    for /f "delims=" %%a in ('wsl behat -t %1 -o') do @set command=%%a
+IF "%1%"=="-t" (
+    for /f "delims=" %%a in ('wsl behat -t %2 -o') do @set command=%%a
 )
 %DOCKERDIR%/bin/moodle-docker-compose.cmd !command!
 
-REM no option for paralle running of tests
+REM no option for parallel running of tests

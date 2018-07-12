@@ -9,14 +9,14 @@ IF NOT EXIST "%MOODLE_DOCKER_WWWROOT%" (
 )
 SET DOCKERDIR=%MOODLE_DOCKER_WWWROOT%\moodle-docker
 
-IF /I "%1%"=="drop" (
+IF /I "%1%"=="-d" (
     echo "dropping tests"
     for /f "delims=" %%a in ('wsl phpu -d -o') do @set command=%%a
     %DOCKERDIR%/bin/moodle-docker-compose.cmd !command!
     EXIT 0
 )
 
-IF /I "%1%"=="init" (
+IF /I "%1%"=="-i" (
     echo "initializing phpunit tests"
     for /f "delims=" %%a in ('wsl phpu -i -o') do @set command=%%a
     %DOCKERDIR%/bin/moodle-docker-compose.cmd !command!
@@ -29,5 +29,5 @@ IF "%1%"=="" (
     ECHO "missing component to run behat tests on"
     EXIT /B 1
 )
-for /f "delims=" %%a in ('wsl phpu -t %1 -o') do @set command=%%a
+for /f "delims=" %%a in ('wsl phpu -t %2 -o') do @set command=%%a
 %DOCKERDIR%/bin/moodle-docker-compose.cmd !command!
