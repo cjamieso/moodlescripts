@@ -1,38 +1,33 @@
 #!/bin/bash
 
-while getopts ":t:doib" arg; do
-  case $arg in
-    t)
-      t=1
-      tags="$OPTARG"
-      ;;
-    d)
-      drop=1
-      ;;
-    o)
-      output=1
-      ;;
-    i)
-      init=1
-      ;;
-    b)
-      build=1
-      ;;
-    \?)
-      echo "Invalid option: -$OPTARG". >&2
-      ;;
-    :)
-      echo "Option -$OPTARG requires an argument." >&2
-      ;;
-  esac
-done
+options=$(getopt -o t:bdoi --long tag:,build,drop,init,output -- "$@")
+eval set -- "$options"
 
-# expects name to be in $a
-function translate_testtype {
-    a=$(echo $a | sed 's,/,_,g')
-    a=$(echo $a | sed 's,course_format,format,g')
-    export a=$(echo $a | sed 's,blocks,block,g')
-}
+while true ; do
+    case "$1" in
+        -t|--tag)
+            t=1
+            tags="$2"
+            ;;
+        -b|--build)
+            build=1
+            ;;
+        -d|--drop)
+            drop=1
+            ;;
+        -i|--init)
+            init=1
+            ;;
+        -o|--output)
+            output=1
+            ;;
+        --)
+            shift
+            break
+            ;;
+    esac
+    shift
+done
 
 export PHP=$(type -p php)
 if [ "$drop" = 1 ];
@@ -45,26 +40,22 @@ elif [ "$build" = 1 ];
 then
     command="php admin/tool/phpunit/cli/util.php --buildcomponentconfigs"
 else
-    command="vendor/bin/phpunit -c ${a}"
-  # check for tests specified
-  if [ "$t" -ne 1 ];
-  then
-     export PLUGINS=$($PHP -f $DIR/moodlescripts/get_diff.php)
-     read -ra arr <<<"$PLUGINS"
-     for a in "${arr[@]}"; do
-         translate_testtype
-     done
-  else
-     export a=$tags
-     translate_testtype
-  fi
+    # check for tests specified
+    if [ "$t" -ne 1 ];
+    then
+        export PLUGINS=$($PHP -f $DIR/moodlescripts/get_diff.php)
+        read -ra arr <<<"$PLUGINS"
+    else
+       export TESTTYPE=$tags
+    fi
+    command="vendor/bin/phpunit -c"
 fi
 
 # For travis builds, use its home dir, otherwise use /vagrant
 if [ -z "$TRAVIS_BUILD_DIR" ];
 then
     export DIR=/vagrant
-    command="exec webserver ${command} ${a}"
+    command="exec webserver ${command} ${TESTTYPE}"
     if [ "$output" = 1 ];
     then
         echo "${command}"
@@ -74,7 +65,10 @@ then
     fi
 else
     export DIR=$TRAVIS_BUILD_DIR
-    cd $DIR
-    eval ${command} ${a}
-    cd -
+        for a in "${arr[@]}"; do
+            export $TESTTYPE="$a"
+            cd $DIR
+            eval ${command} ${TESTTYPE}
+            cd -
+       done
 fi
