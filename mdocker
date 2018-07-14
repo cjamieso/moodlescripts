@@ -6,7 +6,7 @@ then
     exit 1
 fi
 DOCKERDIR="${MOODLE_DOCKER_WWWROOT}/moodle-docker"
-WEBSERVER='$( docker ps --filter "name=webserver" --format "{{.Names}}" )'
+WEBSERVER="$( docker ps --filter "name=webserver" --format {{.Names}} )"
 
 options=$(getopt -o d:pcrs --long delete:,post,cache,rsync,sync,start,stop,destroy,install -- "$@")
 eval set -- "$options"
@@ -15,41 +15,41 @@ while true ; do
     case "$1" in
         -d|--delete)
             echo "wiping container $2"
-            # ID='$( docker ps -a --filter "name=$2" --format "{{.ID}}" )'
-            # docker stop $ID
-            # docker rm $ID
+            ID="$( docker ps -a --filter "name=$2" --format {{.ID}} )"
+            docker stop $ID
+            docker rm $ID
             ;;
         -p|--post)
             echo "changing post size"
-            # docker exec -it $WEBSERVER /bin/bash -c "echo -e 'post_max_size = 256M \nupload_max_filesize = 256M' > /usr/local/etc/php/php.ini"
+            docker exec -it $WEBSERVER /bin/bash -c "echo -e 'post_max_size = 256M \nupload_max_filesize = 256M' > /usr/local/etc/php/php.ini"
             ;;
         -c|--cache)
             echo "purging caches"
-            # $DOCKERDIR/bin/moodle-docker-compose.cmd exec webserver php admin/cli/purge_caches.php
+            $DOCKERDIR/bin/moodle-docker-compose.cmd exec webserver php admin/cli/purge_caches.php
             ;;
         -r|--rsync)
             echo "installing rsync on webserver"
-            # docker exec -it $WEBSERVER "apt-get update && apt-get -y install rsync"
+            docker exec -it $WEBSERVER /bin/bash -c "apt-get update && apt-get -y install rsync"
             ;;
         -s|--sync)
             echo "syncing files"
-            # docker exec -it $WEBSERVER /bin/bash -c "rsync -aqr --chmod=777 /var/html /var/www/"
+            docker exec -it $WEBSERVER /bin/bash -c "rsync -aqr --chmod=777 /var/html /var/www/"
             ;;
         --start)
             echo "starting containers"
-            # $DOCKERDIR/bin/moodle-docker-compose up -d
+            $DOCKERDIR/bin/moodle-docker-compose up -d
             ;;
         --stop)
             echo "stopping containers"
-            # $DOCKERDIR/bin/moodle-docker-compose stop
+            $DOCKERDIR/bin/moodle-docker-compose stop
             ;;
         --destroy)
             echo "destroying containers"
-            # $DOCKERDIR/bin/moodle-docker-compose down
+            $DOCKERDIR/bin/moodle-docker-compose down
             ;;
         --install)
             echo "installing moodle"
-            # $DOCKERDIR/bin/moodle-docker-compose exec webserver php admin/cli/install_database.php --agree-license --fullname="Docker moodle" --shortname="docker_moodle" --adminpass="test" --adminemail="cjamieso@ualberta.ca"
+            $DOCKERDIR/bin/moodle-docker-compose exec webserver php admin/cli/install_database.php --agree-license --fullname="Docker moodle" --shortname="docker_moodle" --adminpass="test" --adminemail="cjamieso@ualberta.ca"
             ;;
         --)
             shift
