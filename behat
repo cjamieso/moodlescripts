@@ -68,7 +68,7 @@ function docker {
 
     if [ "$rerun" = 1 ];
     then
-        $command="${command} --rerun"
+        command="${command} --rerun"
     fi
     process_command
 }

@@ -7,8 +7,9 @@ then
 fi
 DOCKERDIR="${MOODLE_DOCKER_WWWROOT}/moodle-docker"
 WEBSERVER="$( docker ps --filter "name=webserver" --format {{.Names}} )"
+DB="$( docker ps --filter "name=db" --format {{.Names}} )"
 
-options=$(getopt -o d:pcrs --long delete:,post,cache,rsync,sync,start,stop,destroy,install -- "$@")
+options=$(getopt -o d:l:pcrs --long delete:,login:,post,cache,rsync,sync,start,stop,destroy,install -- "$@")
 eval set -- "$options"
 
 while true ; do
@@ -19,13 +20,18 @@ while true ; do
             docker stop $ID
             docker rm $ID
             ;;
+        -l|--login)
+            echo "logging into container $2"
+            NAME="$( docker ps -a --filter "name=$2" --format {{.Names}} )"
+            docker exec -it $NAME /bin/bash
+            ;;
         -p|--post)
             echo "changing post size"
             docker exec -it $WEBSERVER /bin/bash -c "echo -e 'post_max_size = 256M \nupload_max_filesize = 256M' > /usr/local/etc/php/php.ini"
             ;;
         -c|--cache)
             echo "purging caches"
-            $DOCKERDIR/bin/moodle-docker-compose.cmd exec webserver php admin/cli/purge_caches.php
+            $DOCKERDIR/bin/moodle-docker-compose exec webserver php admin/cli/purge_caches.php
             ;;
         -r|--rsync)
             echo "installing rsync on webserver"
