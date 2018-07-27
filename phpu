@@ -29,7 +29,16 @@ while true ; do
     shift
 done
 
+# Set directories
 export PHP=$(type -p php)
+if [ -z "$TRAVIS_BUILD_DIR" ];
+then
+    export DIR=/vagrant
+else
+    export DIR=$TRAVIS_BUILD_DIR
+fi
+
+# Setup command
 if [ "$drop" = 1 ];
 then
     command="php admin/tool/phpunit/cli/util.php --drop"
@@ -41,7 +50,7 @@ then
     command="php admin/tool/phpunit/cli/util.php --buildcomponentconfigs"
 else
     # check for tests specified
-    if [ "$t" -ne 1 ];
+    if [ "$t" != 1 ];
     then
         export PLUGINS=$($PHP -f $DIR/moodlescripts/get_diff.php)
         read -ra arr <<<"$PLUGINS"
@@ -51,10 +60,9 @@ else
     command="vendor/bin/phpunit -c"
 fi
 
-# For travis builds, use its home dir, otherwise use /vagrant
+# Process command
 if [ -z "$TRAVIS_BUILD_DIR" ];
 then
-    export DIR=/vagrant
     command="exec webserver ${command} ${TESTTYPE}"
     if [ "$output" = 1 ];
     then
@@ -64,11 +72,10 @@ then
         eval "$DOCKERDIR/bin/moodle-docker-compose ${command}"
     fi
 else
-    export DIR=$TRAVIS_BUILD_DIR
-        for a in "${arr[@]}"; do
-            export $TESTTYPE="$a"
-            cd $DIR
-            eval ${command} ${TESTTYPE}
-            cd -
-       done
+    for a in "${arr[@]}"; do
+        export $TESTTYPE="$a"
+        cd $DIR
+        eval ${command} ${TESTTYPE}
+        cd -
+   done
 fi
