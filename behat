@@ -103,7 +103,7 @@ function travis {
 #now run tests
 export PHP=$(type -p php)
 # check for tests specified
-if [ "$t" -ne 1 ];
+if [ "$t" != 1 ];
 then
     export PLUGINS=$($PHP -f $DIR/moodlescripts/get_diff.php)
     read -ra arr <<<"$PLUGINS"
