@@ -73,7 +73,7 @@ then
     fi
 else
     for a in "${arr[@]}"; do
-        export $TESTTYPE="$a"
+        export TESTTYPE="$a"
         cd $DIR
         eval ${command} ${TESTTYPE}
         cd -
