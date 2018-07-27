@@ -102,6 +102,15 @@ function travis {
 
 #now run tests
 export PHP=$(type -p php)
+# Set DIR and YMLDIR
+if [ -z "$TRAVIS_BUILD_DIR" ]; then
+    export DIR=/vagrant
+    export YMLDIR=/b_moodledata/behat
+else
+    export DIR=$TRAVIS_BUILD_DIR
+    export YMLDIR=/home/travis/roots/behatdata/behat
+fi
+
 # check for tests specified
 if [ "$t" != 1 ];
 then
@@ -117,11 +126,7 @@ fi
 
 # For non-travis builds, run commands in docker
 if [ -z "$TRAVIS_BUILD_DIR" ]; then
-    export DIR=/vagrant
-    export YMLDIR=/b_moodledata/behat
     docker
 else
-    export DIR=$TRAVIS_BUILD_DIR
-    export YMLDIR=/home/travis/roots/behatdata/behat
     travis
 fi
