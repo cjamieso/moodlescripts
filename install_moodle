@@ -83,7 +83,9 @@ then
 
     # Setup grunt and build the min sources. - THIS CAN PROBABLY BE FIX (node_modules/.bin/grunt amd)
     npm install --no-spin
-    npm install --no-spin -g grunt-cli
-    grunt amd
+    ls
+    ls node_modules/.bin
+    # npm install --no-spin -g grunt-cli
+    node_modules/.bin/grunt amd
 fi
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-options=$(getopt -o p:dt --long tag:,rerun,drop,init,output -- "$@")
+options=$(getopt -o p:dtg --long po:,difflast,theme,grunt -- "$@")
 eval set -- "$options"
 
 while true ; do
@@ -15,6 +15,9 @@ while true ; do
         -t|--theme)
             theme=1
             ;;
+        -g|--grunt)
+            grunt=1
+            ;;
         --)
             shift
             break
@@ -24,12 +27,12 @@ while true ; do
 done
 
 PROJECTS=~/gitprojects
-UNAME=`ls /mnt/c/Users | grep "^c"`
+UNAME=`ls /c/Users | grep "^c"`
 if [ -z $UNAME ]; then
     echo "UNAME not correctly located"
-    return 1;
+    exit 1;
 fi
-export DIR=/mnt/c/Users/$UNAME
+export DIR=/c/Users/$UNAME
 
 # Push code to branch.
 if [ "$po" == 1 ];
@@ -66,4 +69,12 @@ then
 
     sudo rm -rf $PROJECTS/moodle343/local/eclass
     cp -R $PROJECTS/eclass-craig/local/eclass $PROJECTS/moodle343/local
+fi
+
+if [ "$grunt" == 1 ]
+then
+    echo "Code dir is: {$DIR}"
+    cd $DIR/gitprojects/moodle343
+    node_modules/.bin/grunt amd
+    cd -
 fi
