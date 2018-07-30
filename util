@@ -1,0 +1,69 @@
+#!/bin/bash
+
+options=$(getopt -o p:dt --long tag:,rerun,drop,init,output -- "$@")
+eval set -- "$options"
+
+while true ; do
+    case "$1" in
+        -p|--po)
+            po=1
+            pushto="$2"
+            ;;
+        -d|--difflast)
+            difflast=1
+            ;;
+        -t|--theme)
+            theme=1
+            ;;
+        --)
+            shift
+            break
+            ;;
+    esac
+    shift
+done
+
+PROJECTS=~/gitprojects
+UNAME=`ls /mnt/c/Users | grep "^c"`
+if [ -z $UNAME ]; then
+    echo "UNAME not correctly located"
+    return 1;
+fi
+export DIR=/mnt/c/Users/$UNAME
+
+# Push code to branch.
+if [ "$po" == 1 ];
+then
+    if [[ "$pushto" =~ ^[0-9]+$ ]]; then
+        echo "pushing to test, wip-LMS-$pushto"
+        echo "numeric detected, pushing to test"
+        git push -f origin HEAD:wip-LMS-$pushto
+    elif [ "$pushto" = "dev" ]; then
+        echo "pushing code to dev"
+        git push eclass-dev HEAD:DEV_34
+    else
+        echo "intended usage: dev | number"
+    fi
+fi
+
+# Run git diff on last branch
+if [ "$difflast" == 1 ]
+then
+    if [ -z $LASTBRANCH ]; then
+        echo "No last branch found, did you forget to use .?"
+        exit 1
+    fi
+
+    echo "Running diff on branch: ${LASTBRANCH}"
+    git diff --stat origin/${LASTBRANCH} ${LASTBRANCH}
+fi
+
+# Update eclass theme
+if [ "$theme" == 1 ]
+then
+    echo "Code dir is: {$DIR}"
+    echo "Ensure that eclass-craig is set to an updated branch"
+
+    sudo rm -rf $PROJECTS/moodle343/local/eclass
+    cp -R $PROJECTS/eclass-craig/local/eclass $PROJECTS/moodle343/local
+fi
