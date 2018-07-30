@@ -33,3 +33,57 @@ sed -i "s%</ruleset>%<rule ref=\"moodle.Commenting.InlineComment.DocBlock\">\
 <severity>0</severity>\
 </rule>\
 </ruleset>%" local/codechecker/moodle/ruleset.xml
+
+# PHPUNIT setup
+if [ "$PHPUNIT" = 'true' ] && [ "$CI_NODE_INDEX" -eq 1 ] ;
+then
+    # Create a directory for the phpunit dataroot.
+    mkdir -p "$HOME"/roots/phpunit
+
+    # The phpunit dataroot and prefix..
+    sed -i \
+    -e "/require_once/i \\\$CFG->phpunit_dataroot = '\/home\/travis\/roots\/phpunit';" \
+    -e "/require_once/i \\\$CFG->phpunit_prefix = 'p_';" \
+    config.php ;
+
+    # Initialise PHPUnit for Moodle.
+    php admin/tool/phpunit/cli/init.php
+    php admin/tool/phpunit/cli/util.php --buildcomponentconfigs
+fi
+
+# BEHAT setup
+if [ "$BEHAT" = 'true' ];
+then
+    BEHAT_PREFIX='bht_'
+
+    PARALLELPERNODE=$(($PARALLELRUNS/$CI_NODE_TOTAL))
+    TORUN=$(($CI_NODE_INDEX*$PARALLELPERNODE))
+    FROMRUN=$(($TORUN-$PARALLELPERNODE+1))
+
+    # behat setup in config.php (remove call to setup.php, fill in behat info, replace call to setup.php)
+    sed -i s/require.*setup.php.*// config.php
+    echo "\$CFG->behat_wwwroot = 'http://localhost:8000';" >> config.php
+    echo "\$CFG->behat_dataroot = '$BEHAT_DATAROOT';" >> config.php
+    echo "\$CFG->behat_prefix = '$BEHAT_PREFIX';" >> config.php
+    echo "\$CFG->behat_faildump_path = '/home/travis/roots/behatfail';" >> config.php
+    echo "\$CFG->behat_profiles = [" >> config.php
+    for ((i=1;i<=$PARALLELRUNS;i+=1)); do echo "'firefox_$i' => ['browser' => 'firefox']," >> config.php; done;
+    echo "];" >> config.php
+    echo "\$CFG->behat_parallel_run = array(" >> config.php
+    for ((i=1;i<=$PARALLELRUNS;i+=1)); do DBSUFFIX=$(($i%$MAXDB+1)) && echo "array('dbname' => '$DBNAME$DBSUFFIX', 'behat_prefix' => '$BEHAT_PREFIX$i')," >> config.php; done;
+    echo ");" >> config.php
+    echo "require_once(dirname(__FILE__) . '/lib/setup.php');" >> config.php
+
+    # Create directories
+    mkdir -m777 $BEHAT_DATAROOT
+    mkdir -m777 -p "$HOME"/roots/behatfail
+    for ((i=1;i<=$PARALLELRUNS;i+=1)); do mkdir -m777 $BEHAT_DATAROOT$i; done;
+    php -S localhost:8000 > /dev/null 2>&1 &
+    php admin/tool/behat/cli/init.php -j=$PARALLELRUNS -m=$PARALLELPERNODE --fromrun=$FROMRUN --torun=$TORUN
+
+    # Setup grunt and build the min sources. - THIS CAN PROBABLY BE FIX (node_modules/.bin/grunt amd)
+    npm install --no-spin
+    npm install --no-spin -g grunt-cli
+    grunt amd
+fi
+
