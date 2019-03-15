@@ -37,7 +37,7 @@ export DIR=/c/Users/$UNAME
 # Push code to branch.
 if [ "$po" == 1 ];
 then
-    if [[ "$pushto" =~ ^[0-9]+$ ]]; then
+    if [[ "$pushto" =~ ^[-0-9]+$ ]]; then
         echo "pushing to test, wip-LMS-$pushto"
         echo "numeric detected, pushing to test"
         git push -f origin HEAD:wip-LMS-$pushto

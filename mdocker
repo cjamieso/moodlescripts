@@ -55,7 +55,7 @@ while true ; do
             ;;
         --install)
             echo "installing moodle"
-            $DOCKERDIR/bin/moodle-docker-compose exec webserver php admin/cli/install_database.php --agree-license --fullname="Docker moodle" --shortname="docker_moodle" --adminpass="test" --adminemail="cjamieso@ualberta.ca"
+            $DOCKERDIR/bin/moodle-docker-compose exec webserver php admin/cli/install_database.php --agree-license --fullname="Docker moodle" --shortname="docker_moodle" --adminpass="8Ix4b0b3%!6ddf2s" --adminemail="cjamieso@ualberta.ca"
             ;;
         --)
             shift
