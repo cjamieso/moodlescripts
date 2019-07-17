@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export MOODLEVERSION=343
+export MOODLEVERSION=354
 
 function setup_repos {
     # Setup Repos
@@ -87,18 +87,16 @@ function setup_config {
     sudo apt-get update -y
     sudo apt-get install -y php7.1
     sudo apt-get install -y php7.1-xml
-    # sudo apt-get install -y php-codesniffer
-    # cd ~/gitprojects/moodle$MOODLEVERSION/local/codechecker
-    # sudo cp -R moodle /usr/share/php/PHP/CodeSniffer/Standards
-    # sudo cp -R PHPCompatibility /usr/share/php/PHP/CodeSniffer/Standards
+    sudo ln -s ~/gitprojects/moodle$MOODLEVERSION/local/codechecker/pear/PHP/scripts/phpcs /usr/bin/phpcs
+    phpcs --config-set installed_paths ~/gitprojects/moodle$MOODLEVERSION/local/codechecker
 }
 
-UNAME=`ls /mnt/c/Users | grep "^c"`
+UNAME=`ls /c/Users | grep "^c"`
 if [ -z $UNAME ]; then
     echo "UNAME not correctly located"
     return 1;
 fi
-export DIR=/mnt/c/Users/$UNAME/gitprojects
+export DIR=/c/Users/$UNAME/gitprojects
 
 echo "Code folder set to: {$DIR}"
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-UNAME=`ls /mnt/c/Users | grep "^c"`
+UNAME=`ls /c/Users | grep "^c"`
 if [ -z $UNAME ]; then
     echo "UNAME not correctly located"
     return 1;
@@ -11,8 +11,8 @@ sudo wget https://storage.googleapis.com/golang/go1.9.2.linux-amd64.tar.gz
 sudo tar -C /usr/local -xzf go1.9.2.linux-amd64.tar.gz
 export PATH=$PATH:/usr/local/go/bin
 go get -d github.com/jstarks/npiperelay
-GOOS=windows go build -o /mnt/c/Users/$UNAME/go/bin/npiperelay.exe github.com/jstarks/npiperelay
-sudo ln -s /mnt/c/Users/$UNAME/go/bin/npiperelay.exe /usr/local/bin/npiperelay.exe
+GOOS=windows go build -o /c/Users/$UNAME/go/bin/npiperelay.exe github.com/jstarks/npiperelay
+sudo ln -s /c/Users/$UNAME/go/bin/npiperelay.exe /usr/local/bin/npiperelay.exe
 sudo apt install -y socat
 
 # Now, install docker, taken from: https://nickjanetakis.com/blog/setting-up-docker-for-windows-and-wsl-to-work-flawlessly
