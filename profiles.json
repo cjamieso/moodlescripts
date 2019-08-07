@@ -2,7 +2,7 @@
     "globals" : 
     {
         "alwaysShowTabs" : true,
-        "defaultProfile" : "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+        "defaultProfile" : "{2c4de342-38b7-51cf-b940-2309a097f518}",
         "initialCols" : 120,
         "initialRows" : 30,
         "keybindings" : 
@@ -282,7 +282,7 @@
             "useAcrylic" : true
         },
         {
-            "acrylicOpacity" : 0.5,
+            "acrylicOpacity" : 0.75,
             "closeOnExit" : true,
             "colorScheme" : "Ubuntu",
             "commandline" : "wsl.exe -d Ubuntu",
@@ -297,7 +297,7 @@
             "padding" : "0, 0, 0, 0",
             "snapOnInput" : true,
             "startingDirectory" : "%USERPROFILE%",
-            "useAcrylic" : false,
+            "useAcrylic" : true,
             "tabTitle" : "Ubuntu"
         }
     ],
