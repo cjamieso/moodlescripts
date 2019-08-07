@@ -17,10 +17,13 @@
 from SublimeLinter.lint import Linter, util
 
 
-class Php(Linter):
+class PHP(Linter):
     """Provides an interface to php -l."""
 
-    syntax = ('php', 'html', 'html 5')
+    defaults = {
+        'selector': 'source.php, text.html.basic'
+    }
+
     cmd = ('php', '-l', '-n', '-d', 'display_errors=On', '-d', 'log_errors=Off', '${file}', '-')
     regex = (
         r'^(?:Parse|Fatal) (?P<error>error):(\s*(?P<type>parse|syntax) error,?)?\s*'
