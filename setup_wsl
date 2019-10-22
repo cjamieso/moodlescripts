@@ -21,7 +21,7 @@ function setup_repos {
     cd moodle$MOODLEVERSION
     git remote set-url origin git@github.com:cjamieso/moodle$MOODLEVERSION.git
     git clone git://github.com/moodlehq/moodle-local_codechecker.git local/codechecker
-    git clone git@github.com:moodlehq/moodle-docker.git
+    git clone git://github.com/moodlehq/moodle-docker.git
     # git submodule update --init
 
     echo "[Adding eclass repo]"
