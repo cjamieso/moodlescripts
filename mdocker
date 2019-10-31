@@ -39,7 +39,7 @@ while true ; do
             ;;
         -s|--sync)
             echo "syncing files"
-            docker exec -it $WEBSERVER /bin/bash -c "rsync -aqr --chmod=777 /var/html /var/www/"
+            docker exec -it $WEBSERVER /bin/bash -c "rsync -aqr --chmod=777 --exclude 'node_modules/' /var/html /var/www/"
             ;;
         --start)
             echo "starting containers"
