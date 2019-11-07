@@ -112,6 +112,10 @@ fi
 if [ "$t" != 1 ];
 then
     export PLUGINS=$($PHP -f $DIR/moodlescripts/get_diff.php)
+    echo $PLUGINS
+    if [ -z "$PLUGINS" ]; then
+        exit 0
+    fi
     read -ra arr <<<"$PLUGINS"
     for a in "${arr[@]}"; do
         translate_testtype
