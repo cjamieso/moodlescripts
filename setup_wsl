@@ -42,6 +42,15 @@ function setup_repos {
     git remote add craig ~/gitprojects/moodle$MOODLEVERSION
     git fetch craig
 
+    echo "[Adding eclass style repo]"
+    # Setup eclass-craig
+    cd ~/gitprojects
+    if ! (git clone git@bitbucket.org:cjamieso/boost-eclass-branding.git)
+        then
+        echo "Error cloning eclass-craig: is SSH key setup?"
+        exit 1
+    fi
+
     echo "[Adding moodlescripts]"
     # Setup moodlescripts project
     cd ~/gitprojects
@@ -70,7 +79,7 @@ function setup_config {
 
     cd ~/gitprojects/moodlescripts
     sudo cp rebase util behat phpu mdocker /usr/local/bin
-    cp .gitconfig.ubuntu ~/.gitconfig
+    cp .gitconfig ~/.gitconfig
     git config --global rerere.enabled true
 
     echo "[Setting up nodejs]"
@@ -90,6 +99,7 @@ function setup_config {
     sudo ln -s ~/gitprojects/moodle$MOODLEVERSION/local/codechecker/pear/PHP/scripts/phpcs /usr/bin/phpcs
     phpcs --config-set installed_paths ~/gitprojects/moodle$MOODLEVERSION/local/codechecker
 
+    echo "[Configuring Locales]"
     # Configuring locale
     sudo locale-gen en_US.UTF-8
     sudo dpkg-reconfigure locales

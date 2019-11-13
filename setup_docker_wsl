@@ -7,11 +7,13 @@ if [ -z $UNAME ]; then
 fi
 
 sudo apt-get update
-sudo wget https://storage.googleapis.com/golang/go1.9.2.linux-amd64.tar.gz
-sudo tar -C /usr/local -xzf go1.9.2.linux-amd64.tar.gz
-export PATH=$PATH:/usr/local/go/bin
-go get -d github.com/jstarks/npiperelay
-GOOS=windows go build -o /c/Users/$UNAME/go/bin/npiperelay.exe github.com/jstarks/npiperelay
+# Bug in go for building npiperelay - included manually in repo now.
+# sudo wget https://storage.googleapis.com/golang/go1.9.2.linux-amd64.tar.gz
+# sudo tar -C /usr/local -xzf go1.9.2.linux-amd64.tar.gz
+# export PATH=$PATH:/usr/local/go/bin
+# go get -d github.com/jstarks/npiperelay
+# GOOS=windows go build -o /c/Users/$UNAME/go/bin/npiperelay.exe github.com/jstarks/npiperelay
+sudo cp npiperelay.exe /c/Users/$UNAME/go/bin/
 sudo ln -s /c/Users/$UNAME/go/bin/npiperelay.exe /usr/local/bin/npiperelay.exe
 sudo apt install -y socat
 
