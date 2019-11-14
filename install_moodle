@@ -67,7 +67,7 @@ then
     echo "\$CFG->behat_prefix = '$BEHAT_PREFIX';" >> config.php
     echo "\$CFG->behat_faildump_path = '/home/travis/roots/behatfail';" >> config.php
     echo "\$CFG->behat_profiles = [" >> config.php
-    for ((i=1;i<=$PARALLELRUNS;i+=1)); do echo "'firefox_$i' => ['browser' => 'firefox']," >> config.php; done;
+    for ((i=1;i<=$PARALLELRUNS;i+=1)); do echo "'chrome_$i' => ['browser' => 'chrome']," >> config.php; done;
     echo "];" >> config.php
     echo "\$CFG->behat_parallel_run = array(" >> config.php
     for ((i=1;i<=$PARALLELRUNS;i+=1)); do DBSUFFIX=$(($i%$MAXDB+1)) && echo "array('dbname' => '$DBNAME$DBSUFFIX', 'behat_prefix' => '$BEHAT_PREFIX$i')," >> config.php; done;
