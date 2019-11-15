@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# expects name to be in $a
+function translate_testtype {
+    a=$(echo $a | sed 's,/,_,g')
+    a=$(echo $a | sed 's,course_format,format,g')
+    export a=$(echo $a | sed 's,blocks,block,g')
+}
+
 DBUSER='postgres'
 
 # Set timzone for build.
@@ -18,16 +25,11 @@ sed -i s/\'password\'/\'$dbpass\'/ config.php
 # The wwwroot and dataroot
 sed -i \
   -e "s%http://example.com/moodle%http://localhost%" \
-  -e "s%/home/example/moodledata%/home/travis/moodledata%" \
+  -e "s%/home/example/moodledata%${HOME}/moodledata%" \
   config.php ;
 
 # This DB is used by phpunit
 psql -c "create database $DBNAME;" -U $DBUSER;
-# These DBs are used by behat
-for ((i=1;i<=$MAXDB;i+=1)); do
-  psql -c "create database $DBNAME$i;" -U $DBUSER;
-done;
-
 
 sed -i "s%</ruleset>%<rule ref=\"moodle.Commenting.InlineComment.DocBlock\">\
 <severity>0</severity>\
@@ -54,32 +56,72 @@ fi
 # BEHAT setup
 if [ "$BEHAT" = 'true' ];
 then
-    BEHAT_PREFIX='bht_'
+    BEHAT_PREFIX='b_'
 
-    PARALLELPERNODE=$(($PARALLELRUNS/$CI_NODE_TOTAL))
-    TORUN=$(($CI_NODE_INDEX*$PARALLELPERNODE))
-    FROMRUN=$(($TORUN-$PARALLELPERNODE+1))
+    if [ $PARALLELRUNS -gt 1 ];
+    then
+        echo "detected parallel behat config"
+        PARALLELPERNODE=$(($PARALLELRUNS / $CI_NODE_TOTAL))
+        TORUN=$(($CI_NODE_INDEX*$PARALLELPERNODE))
+        FROMRUN=$(($TORUN-$PARALLELPERNODE+1))
+        # These DBs are used by behat for parallel runs
+        for ((i=1;i<=$MAXDB;i+=1)); do
+            psql -c "create database $DBNAME$i;" -U $DBUSER;
+        done;
+    fi
 
     # behat setup in config.php (remove call to setup.php, fill in behat info, replace call to setup.php)
     sed -i s/require.*setup.php.*// config.php
+    echo $BEHAT_DATAROOT
+    echo "\$CFG->behat_prefix = '$BEHAT_PREFIX';" >> config.php
     echo "\$CFG->behat_wwwroot = 'http://localhost:8000';" >> config.php
     echo "\$CFG->behat_dataroot = '$BEHAT_DATAROOT';" >> config.php
-    echo "\$CFG->behat_prefix = '$BEHAT_PREFIX';" >> config.php
-    echo "\$CFG->behat_faildump_path = '/home/travis/roots/behatfail';" >> config.php
+    echo "\$CFG->behat_faildump_path = '$HOME/roots/behatfail';" >> config.php
     echo "\$CFG->behat_profiles = [" >> config.php
-    for ((i=1;i<=$PARALLELRUNS;i+=1)); do echo "'chrome_$i' => ['browser' => 'chrome']," >> config.php; done;
-    echo "];" >> config.php
-    echo "\$CFG->behat_parallel_run = array(" >> config.php
-    for ((i=1;i<=$PARALLELRUNS;i+=1)); do DBSUFFIX=$(($i%$MAXDB+1)) && echo "array('dbname' => '$DBNAME$DBSUFFIX', 'behat_prefix' => '$BEHAT_PREFIX$i')," >> config.php; done;
-    echo ");" >> config.php
+    if [ $PARALLELRUNS -gt 1 ];
+    then
+        for ((i=1;i<=$PARALLELRUNS;i+=1)); do echo "'chrome_$i' => ['browser' => 'chrome', 'wd_host' => 'http://localhost:4444/wd/hub']," >> config.php; done;
+        echo "];" >> config.php
+        echo "\$CFG->behat_parallel_run = array(" >> config.php
+        for ((i=1;i<=$PARALLELRUNS;i+=1)); do DBSUFFIX=$(($i%$MAXDB+1)) && echo "array('dbname' => '$DBNAME$DBSUFFIX', 'behat_prefix' => '$BEHAT_PREFIX$i')," >> config.php; done;
+        echo ");" >> config.php
+    else
+        echo "'chrome' => [" >> config.php
+        echo "'browser' => 'chrome'," >> config.php
+        echo "'wd_host' => 'http://localhost:4444/wd/hub'," >> config.php
+        echo "]," >> config.php
+        echo "];" >> config.php
+    fi
     echo "require_once(dirname(__FILE__) . '/lib/setup.php');" >> config.php
 
-    # Create directories
-    mkdir -m777 $BEHAT_DATAROOT
+    # Create dataroot directories
+    if [ $PARALLELRUNS -gt 1 ];
+    then
+        for ((i=1;i<=$PARALLELRUNS;i+=1)); do mkdir -m777 $BEHAT_DATAROOT$i; done;
+    else
+        mkdir -m777 $BEHAT_DATAROOT
+    fi
+    # Create behatfail directory
     mkdir -m777 -p "$HOME"/roots/behatfail
-    for ((i=1;i<=$PARALLELRUNS;i+=1)); do mkdir -m777 $BEHAT_DATAROOT$i; done;
-    php -S localhost:8000 > /dev/null 2>&1 &
-    php admin/tool/behat/cli/init.php -j=$PARALLELRUNS -m=$PARALLELPERNODE --fromrun=$FROMRUN --torun=$TORUN
+    # Turn on webserver
+    php -S 127.0.0.1:8000 > /dev/null 2>&1 &
+    # Initialize behat testing site
+    if [ $PARALLELRUNS -gt 1 ];
+    then
+        echo "Parallel runs, trying to optimize"
+        export PHP=$(type -p php)
+        export PLUGINS=$($PHP -f $TRAVIS_BUILD_DIR/moodlescripts/get_diff.php)
+        echo $PLUGINS
+        read -ra arr <<<"$PLUGINS"
+        for a in "${arr[@]}"; do
+            translate_testtype
+        done
+        export TAGS=@$a
+        echo $TAGS
+        php admin/tool/behat/cli/init.php -j=$PARALLELRUNS -m=$PARALLELPERNODE --fromrun=$FROMRUN --torun=$TORUN -o=$TAGS
+    else
+        php admin/tool/behat/cli/init.php
+    fi
 
     # Setup grunt and build the min sources
     npm install --no-spin
