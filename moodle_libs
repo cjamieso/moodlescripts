@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# expects tags to be in $a
+function translate_testtype {
+    a=$(echo $a | sed 's,/,_,g')
+    a=$(echo $a | sed 's,course_format,format,g')
+    a=$(echo $a | sed 's,question_type,qtype,g')
+    export a=$(echo $a | sed 's,blocks,block,g')
+    export TAGS=$a
+}
+
+function get_tags_path {
+    export PHP=$(type -p php)
+    export DIR=$TRAVIS_BUILD_DIR
+    export PLUGINS=$($PHP -f $DIR/moodlescripts/get_diff.php)
+    echo $PLUGINS
+    if [ -z "$PLUGINS" ]; then
+        exit 0
+    fi
+    export TAGS=$PLUGINS
+}
+
+function get_tags {
+    get_tags_path
+    read -ra arr <<<"$PLUGINS"
+    for a in "${arr[@]}"; do
+        translate_testtype
+    done
+    export TAGS=$a
+}
+
+# echo command if output is set, otherwise run command
+function process_command {
+    if [ "$output" == 1 ];
+    then
+        echo $command
+        exit 0
+    else
+        DOCKERDIR="${MOODLE_DOCKER_WWWROOT}/moodle-docker"
+        eval "$DOCKERDIR/bin/moodle-docker-compose ${command}"
+        exit 0
+    fi
+
+}

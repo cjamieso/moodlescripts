@@ -60,7 +60,6 @@ then
 
     if [ $PARALLELRUNS -gt 1 ];
     then
-        echo "detected parallel behat config"
         PARALLELPERNODE=$(($PARALLELRUNS / $CI_NODE_TOTAL))
         TORUN=$(($CI_NODE_INDEX*$PARALLELPERNODE))
         FROMRUN=$(($TORUN-$PARALLELPERNODE+1))
@@ -108,17 +107,9 @@ then
     # Initialize behat testing site
     if [ $PARALLELRUNS -gt 1 ];
     then
-        echo "Parallel runs, trying to optimize"
-        export PHP=$(type -p php)
-        export PLUGINS=$($PHP -f $TRAVIS_BUILD_DIR/moodlescripts/get_diff.php)
-        echo $PLUGINS
-        read -ra arr <<<"$PLUGINS"
-        for a in "${arr[@]}"; do
-            translate_testtype
-        done
-        export TAGS=@$a
-        echo $TAGS
-        php admin/tool/behat/cli/init.php -j=$PARALLELRUNS -m=$PARALLELPERNODE --fromrun=$FROMRUN --torun=$TORUN -o=$TAGS
+        source moodle_libs
+        get_tags
+        php admin/tool/behat/cli/init.php -j=$PARALLELRUNS -m=$PARALLELPERNODE --fromrun=$FROMRUN --torun=$TORUN -o=@$TAGS
     else
         php admin/tool/behat/cli/init.php
     fi

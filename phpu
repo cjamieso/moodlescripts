@@ -29,15 +29,7 @@ while true ; do
     shift
 done
 
-# Set directories
-export PHP=$(type -p php)
-if [ -z "$TRAVIS_BUILD_DIR" ];
-then
-    export DIR=/vagrant
-else
-    export DIR=$TRAVIS_BUILD_DIR
-fi
-
+source moodle_libs
 # Setup command
 if [ "$drop" = 1 ];
 then
@@ -52,10 +44,9 @@ else
     # check for tests specified
     if [ "$t" != 1 ];
     then
-        export PLUGINS=$($PHP -f $DIR/moodlescripts/get_diff.php)
-        read -ra arr <<<"$PLUGINS"
+        get_tags_path
     else
-       export TESTTYPE=$tags
+        export TAGS=$tags
     fi
     command="vendor/bin/phpunit -c"
 fi
@@ -63,19 +54,8 @@ fi
 # Process command
 if [ -z "$TRAVIS_BUILD_DIR" ];
 then
-    command="exec webserver ${command} ${TESTTYPE}"
-    if [ "$output" = 1 ];
-    then
-        echo "${command}"
-    else
-        DOCKERDIR="${MOODLE_DOCKER_WWWROOT}/moodle-docker"
-        eval "$DOCKERDIR/bin/moodle-docker-compose ${command}"
-    fi
+    command="exec webserver ${command} ${TAGS}"
+    process_command
 else
-    for a in "${arr[@]}"; do
-        export TESTTYPE="$a"
-        cd $DIR
-        eval ${command} ${TESTTYPE}
-        cd -
-   done
+    eval ${command} ${TAGS}
 fi

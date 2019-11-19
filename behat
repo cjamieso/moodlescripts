@@ -19,7 +19,7 @@ while true ; do
             init=1
             ;;
         -o|--output)
-            output=1
+            export output=1
             ;;
         --)
             shift
@@ -29,20 +29,7 @@ while true ; do
     shift
 done
 
-# echo command if output is set, otherwise run command
-function process_command {
-    if [ "$output" == 1 ];
-    then
-        echo $command
-        exit 0
-    else
-        DOCKERDIR="${MOODLE_DOCKER_WWWROOT}/moodle-docker"
-        eval "$DOCKERDIR/bin/moodle-docker-compose ${command}"
-        exit 0
-    fi
-
-}
-
+source moodle_libs
 # check for dropping of tests first
 if [ "$drop" == 1 ];
 then
@@ -55,16 +42,9 @@ then
     process_command
 fi
 
-# expects name to be in $a
-function translate_testtype {
-    a=$(echo $a | sed 's,/,_,g')
-    a=$(echo $a | sed 's,course_format,format,g')
-    export a=$(echo $a | sed 's,blocks,block,g')
-}
-
 # docker based tests
 function docker {
-    command="exec webserver php admin/tool/behat/cli/run.php --tags=@$a"
+    command="exec webserver php admin/tool/behat/cli/run.php --tags=@$TAGS"
 
     if [ "$rerun" = 1 ];
     then
@@ -75,10 +55,12 @@ function docker {
 
 # travis based tests
 function travis {
-    export TAGS=@$a
+    export DIR=$TRAVIS_BUILD_DIR
+    export YMLDIR=$HOME/moodledata_behat/behatrun/behat/
+
     if [ -z "$PARALLELRUNS" ]; then
         echo "running single behat test thread"
-        $DIR/vendor/bin/behat --config $YMLDIR/behat.yml --tags $TAGS --profile='chrome'
+        $DIR/vendor/bin/behat --config $YMLDIR/behat.yml --tags @$TAGS --profile='chrome'
         exitcode=${PIPESTATUS[0]}
     else
         echo "running behat tests in parallel"
@@ -86,41 +68,22 @@ function travis {
         PARALLELPERNODE=$(($PARALLELRUNS/$CI_NODE_TOTAL))
         TORUN=$(($CI_NODE_INDEX*$PARALLELPERNODE))
         FROMRUN=$(($TORUN-$PARALLELPERNODE+1))
-        php $DIR/admin/tool/behat/cli/run.php --tags=$TAGS --fromrun=$FROMRUN --torun=$TORUN --profile='chrome_{runprocess}' --replace='{runprocess}'
+        php $DIR/admin/tool/behat/cli/run.php --tags=@$TAGS --fromrun=$FROMRUN --torun=$TORUN --profile='chrome_{runprocess}' --replace='{runprocess}'
         exitcode=${PIPESTATUS[0]}
         if [ "${exitcode}" -gt 0 ]; then
-            php $DIR/admin/tool/behat/cli/run.php --tags=$TAGS --fromrun=$FROMRUN --torun=$TORUN --profile='chrome_{runprocess}' --replace='{runprocess}' --rerun
+            php $DIR/admin/tool/behat/cli/run.php --tags=@$TAGS --fromrun=$FROMRUN --torun=$TORUN --profile='chrome_{runprocess}' --replace='{runprocess}' --rerun
             exitcode=${PIPESTATUS[0]}
         fi
     fi
-    curl http://localhost:4444/selenium-server/driver/?cmd=shutDownSeleniumServer
-    # kill -9 $(lsof -ti tcp:4444)
+    # curl http://localhost:4444/selenium-server/driver/?cmd=shutDownSeleniumServer
+    kill -9 $(lsof -ti tcp:4444)
     exit $exitcode
 }
-
-#now run tests
-export PHP=$(type -p php)
-# Set DIR and YMLDIR
-if [ -z "$TRAVIS_BUILD_DIR" ]; then
-    export DIR=/vagrant
-    export YMLDIR=/b_moodledata/behat
-else
-    export DIR=$TRAVIS_BUILD_DIR
-    export YMLDIR=$HOME/moodledata_behat/behatrun/behat/
-fi
 
 # check for tests specified
 if [ "$t" != 1 ];
 then
-    export PLUGINS=$($PHP -f $DIR/moodlescripts/get_diff.php)
-    echo $PLUGINS
-    if [ -z "$PLUGINS" ]; then
-        exit 0
-    fi
-    read -ra arr <<<"$PLUGINS"
-    for a in "${arr[@]}"; do
-        translate_testtype
-    done
+    get_tags
 else
     export a=$tags
     translate_testtype
