@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export MOODLEVERSION=359
+export MOODLEVERSION=381
 
 function setup_repos {
     # Setup Repos
