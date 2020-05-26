@@ -88,6 +88,7 @@ function setup_config {
     sudo apt-get install -y nodejs
     cd ~/gitprojects/moodle$MOODLEVERSION
     npm install
+    sudo ln -s ~/gitprojects/moodle$MOODLEVERSION/node_modules/eslint/bin/eslint.js /usr/local/bin/eslint
 
     echo "[Setting up php7 and phpcs]"
     # Setup PHP7.1 + PHPCS
