@@ -80,6 +80,12 @@ function setup_config {
     touch ~/.vimrc
     echo -e "set visualbell" >> ~/.vimrc
 
+    # set docker variables
+    echo -e "export MOODLE_DOCKER_WWWROOT=/home/craig/gitprojects/moodle$MOODLEVERSION" >> ~/.bashrc
+    echo -e "export MOODLE_DOCKER_WEB_PORT=0.0.0.0:8000" >> ~/.bashrc
+    echo -e "export MOODLE_DOCKER_DB=pgsql" >> ~/.bashrc
+    echo -e "export MOODLE_DOCKER_BROWSER=chrome" >> ~/.bashrc
+
     cd ~/gitprojects/moodlescripts
     sudo cp rebase util behat phpu mdocker /usr/local/bin
     cp .gitconfig ~/.gitconfig
