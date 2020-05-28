@@ -88,7 +88,9 @@ function setup_config {
     echo "[Setting up nodejs]"
     # Setup NodeJS & files inside moodle repo
     curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+    echo "[Installing nodejs]"
     sudo apt-get install -y nodejs
+    echo "[Symlink for eslint]"
     cd ~/gitprojects/moodle$MOODLEVERSION
     sudo ln -s ~/gitprojects/moodle$MOODLEVERSION/node_modules/eslint/bin/eslint.js /usr/local/bin/eslint
 
