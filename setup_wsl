@@ -5,11 +5,14 @@ export MOODLEVERSION=381
 function setup_repos {
     # Setup Repos
     echo "Ensure that you have setup the SSH key for the github repo or this will fail."
-    echo "id_rsa is 600, id_rsa.pub is 644, ~/.ssh is 700"
+    echo "id_rsa is 600, id_rsa.pub, config are 644, ~/.ssh is 700"
 
     # Add symlink for git projects
     cd ~/
-    ln -s $DIR gitprojects
+    SYMLINK=~/gitprojects
+    if [ ! -d "$SYMLINK" ]; then
+        ln -s $DIR gitprojects
+    fi
     echo "[Adding development repo]"
     # Setup moodle github repo
     cd gitprojects
@@ -45,7 +48,7 @@ function setup_repos {
     echo "[Adding eclass style repo]"
     # Setup eclass-craig
     cd ~/gitprojects
-    if ! (git clone git@bitbucket.org:cjamieso/boost-eclass-branding.git)
+    if ! (git clone git@bitbucket.org:uofa-eclass/boost-eclass-branding.git)
         then
         echo "Error cloning eclass-craig: is SSH key setup?"
         exit 1
@@ -84,10 +87,9 @@ function setup_config {
 
     echo "[Setting up nodejs]"
     # Setup NodeJS & files inside moodle repo
-    curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+    curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
     sudo apt-get install -y nodejs
     cd ~/gitprojects/moodle$MOODLEVERSION
-    npm install
     sudo ln -s ~/gitprojects/moodle$MOODLEVERSION/node_modules/eslint/bin/eslint.js /usr/local/bin/eslint
 
     echo "[Setting up php7 and phpcs]"
