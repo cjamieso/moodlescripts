@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export MOODLEVERSION=381
+export MOODLEVERSION=383
 
 function setup_repos {
     # Setup Repos
@@ -93,7 +93,7 @@ function setup_config {
 
     echo "[Setting up nodejs]"
     # Setup NodeJS & files inside moodle repo
-    curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+    curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
     echo "[Installing nodejs]"
     sudo apt-get install -y nodejs
     echo "[Symlink for eslint]"
