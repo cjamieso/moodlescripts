@@ -45,14 +45,14 @@ function setup_repos {
     git remote add craig ~/gitprojects/moodle$MOODLEVERSION
     git fetch craig
 
-    # echo "[Adding eclass style repo]"
+    echo "[Adding eclass style repo]"
     # Setup eclass-craig
-    # cd ~/gitprojects
-    # if ! (git clone git@bitbucket.org:uofa-eclass/boost-eclass-branding.git)
-        # then
-        # echo "Error cloning eclass-craig: is SSH key setup?"
-        # exit 1
-    # fi
+    cd ~/gitprojects
+    if ! (git clone git@bitbucket.org:isteclass/boost-eclass-branding.git)
+        then
+        echo "Error cloning eclass-craig: is SSH key setup?"
+        exit 1
+    fi
 
     echo "[Adding moodlescripts]"
     # Setup moodlescripts project
@@ -87,7 +87,7 @@ function setup_config {
     echo -e "export MOODLE_DOCKER_BROWSER=chrome" >> ~/.bashrc
 
     cd ~/gitprojects/moodlescripts
-    sudo cp rebase util behat phpu mdocker /usr/local/bin
+    sudo cp rebase util behat phpu mdocker moodle_libs /usr/local/bin
     cp .gitconfig ~/.gitconfig
     git config --global rerere.enabled true
 
