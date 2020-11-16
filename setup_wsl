@@ -45,14 +45,14 @@ function setup_repos {
     git remote add craig ~/gitprojects/moodle$MOODLEVERSION
     git fetch craig
 
-    echo "[Adding eclass style repo]"
+    # echo "[Adding eclass style repo]"
     # Setup eclass-craig
-    cd ~/gitprojects
-    if ! (git clone git@bitbucket.org:uofa-eclass/boost-eclass-branding.git)
-        then
-        echo "Error cloning eclass-craig: is SSH key setup?"
-        exit 1
-    fi
+    # cd ~/gitprojects
+    # if ! (git clone git@bitbucket.org:uofa-eclass/boost-eclass-branding.git)
+        # then
+        # echo "Error cloning eclass-craig: is SSH key setup?"
+        # exit 1
+    # fi
 
     echo "[Adding moodlescripts]"
     # Setup moodlescripts project
@@ -117,12 +117,12 @@ function setup_config {
     sudo dpkg-reconfigure locales
 }
 
-UNAME=`ls /c/Users | grep "^c"`
+UNAME=`ls /mnt/c/Users | grep "^c"`
 if [ -z $UNAME ]; then
     echo "UNAME not correctly located"
     return 1;
 fi
-export DIR=/c/Users/$UNAME/gitprojects
+export DIR=/mnt/c/Users/$UNAME/gitprojects
 
 echo "Code folder set to: {$DIR}"
 
