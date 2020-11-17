@@ -27,7 +27,7 @@ while true ; do
 done
 
 PROJECTS=~/gitprojects
-UNAME=`ls /c/Users | grep "^c"`
+UNAME=`ls /mnt/c/Users | grep "^c"`
 if [ -z $UNAME ]; then
     echo "UNAME not correctly located"
     exit 1;

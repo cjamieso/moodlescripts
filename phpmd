@@ -27,7 +27,7 @@ if [ -z $UNAME ]; then
     echo "UNAME not correctly located"
     exit 1;
 fi
-export DIR=/c/Users/$UNAME
+export DIR=/mnt/c/Users/$UNAME
 MOODLEDIR=$DIR/gitprojects/moodle$MOODLEVERSION
 
 if [ "$init" == 1 ];
