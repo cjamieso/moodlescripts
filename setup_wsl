@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export MOODLEVERSION=383
+export MOODLEVERSION=3100
 
 function setup_repos {
     # Setup Repos
@@ -108,7 +108,7 @@ function setup_config {
     sudo apt-get update -y
     sudo apt-get install -y php7.1
     sudo apt-get install -y php7.1-xml
-    sudo ln -s ~/gitprojects/moodle$MOODLEVERSION/local/codechecker/pear/PHP/scripts/phpcs /usr/bin/phpcs
+    sudo ln -s ~/gitprojects/moodle$MOODLEVERSION/local/codechecker/phpcs/bin/phpcs /usr/bin/phpcs
     phpcs --config-set installed_paths ~/gitprojects/moodle$MOODLEVERSION/local/codechecker
 
     echo "[Configuring Locales]"

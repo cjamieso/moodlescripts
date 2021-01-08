@@ -15,7 +15,7 @@
 	cm = !git add --all && git commit
 	viewtree = log --all --graph --decorate --oneline
 	cbranch = !BRANCH="$(git name-rev --name-only HEAD)"&&git branch | grep -v "$BRANCH" | xargs git branch -D
-	check = !sh -c 'git diff --stat --no-index ~/gitprojects/moodle383/$1 ~/gitprojects/eclass-craig/$1' -
+	check = !sh -c 'git diff --stat --no-index ~/gitprojects/moodle3100/$1 ~/gitprojects/eclass-craig/$1' -
 	fulldiff = !sh -c 'git diff --stat $1~1 $1' -
 	filediff = !sh -c 'git diff $1~1 $1 -- $2' -
 	countlines = !sh -c 'git ls-files -- $1 | xargs cat | wc -l' -
