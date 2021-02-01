@@ -1,0 +1,12 @@
+#!/bin/bash
+echo "Ignore the docker desktop warning - no windows containers needed"
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+sudo usermod -aG docker $USER
+echo "Installing docker-compse"
+export COMPOSEVERSION=1.28.2
+echo "Version $COMPOSEVERSION"
+sudo curl -L "https://github.com/docker/compose/releases/download/$COMPOSEVERSION/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+echo -e "sudo service docker start" >> ~/.bashrc
+

@@ -67,14 +67,14 @@ then
     echo "Code dir is: {$DIR}"
     echo "Ensure that eclass-craig is set to an updated branch"
 
-    sudo rm -rf $PROJECTS/moodle343/local/eclass
-    cp -R $PROJECTS/eclass-craig/local/eclass $PROJECTS/moodle343/local
+    sudo rm -rf $PROJECTS/moodle$MOODLEVERSION/local/eclass
+    cp -R $PROJECTS/eclass-craig/local/eclass $PROJECTS/moodle$MOODLEVERSION/local
 fi
 
 if [ "$grunt" == 1 ]
 then
     echo "Code dir is: {$DIR}"
-    cd $DIR/gitprojects/moodle343
+    cd $DIR/gitprojects/moodle$MOODLEVERSION
     node_modules/.bin/grunt amd
     cd -
 fi
