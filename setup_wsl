@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export MOODLEVERSION=3100
+export MOODLEVERSION=3115
 
 function setup_repos {
     # Setup Repos
@@ -16,54 +16,65 @@ function setup_repos {
     echo "[Adding development repo]"
     # Setup moodle github repo
     cd gitprojects
-    if ! (git clone git://github.com/cjamieso/moodle$MOODLEVERSION.git)
-        then
-        echo "Error cloning moodle repo."
-        exit 1
+    if [ ! -d "moodle$MOODLEVERSION" ]; then
+        if ! (git clone git@github.com:cjamieso/moodle$MOODLEVERSION.git)
+            then
+            echo "Error cloning moodle repo."
+            exit 1
+        fi
+        cd moodle$MOODLEVERSION
+        git remote set-url origin git@github.com:cjamieso/moodle$MOODLEVERSION.git
+
+        git clone git@github.com:moodlehq/moodle-local_codechecker.git local/codechecker
+        git clone git@github.com:moodlehq/moodle-docker.git
+        # git submodule update --init
+    else
+        echo "[development repo already exists]"
     fi
-    cd moodle$MOODLEVERSION
-    git remote set-url origin git@github.com:cjamieso/moodle$MOODLEVERSION.git
-    git clone git://github.com/moodlehq/moodle-local_codechecker.git local/codechecker
-    git clone git://github.com/moodlehq/moodle-docker.git
-    # git submodule update --init
 
     echo "[Adding eclass repo]"
     # Setup eclass-craig
     cd ~/gitprojects
-    if ! (git clone git@bitbucket.org:cjamieso/eclass-craig.git)
-        then
-        echo "Error cloning eclass-craig: is SSH key setup?"
-        exit 1
+    if [ ! -d "eclass-craig" ]; then
+        if ! (git clone git@bitbucket.org:cjamieso/eclass-craig311.git eclass-craig)
+            then
+            echo "Error cloning eclass-craig: is SSH key setup?"
+            exit 1
+        fi
+        cd eclass-craig
+        git remote add upstream git@bitbucket.org:isteclass/eclass.git
+        git config branch.autosetupmerge always
+        git config branch.autosetuprebase local
+        git config push.default upstream
+        git remote add craig ~/gitprojects/moodle$MOODLEVERSION
+        git fetch craig
+    else
+        echo "[eclass repo already exists]"
     fi
-    cd eclass-craig
-    git remote add eclass-dev ssh://git@bitbucket.org/uofa-eclass/eclass-dev.git
-    git fetch eclass-dev
-    git remote add upstream ssh://git@bitbucket.org/uofa-eclass/eclass.git
-    git config branch.autosetupmerge always
-    git config branch.autosetuprebase local
-    git config push.default upstream
-    git remote add craig ~/gitprojects/moodle$MOODLEVERSION
-    git fetch craig
 
-    echo "[Adding eclass style repo]"
-    # Setup eclass-craig
-    cd ~/gitprojects
-    if ! (git clone git@bitbucket.org:isteclass/boost-eclass-branding.git)
-        then
-        echo "Error cloning eclass-craig: is SSH key setup?"
-        exit 1
-    fi
+    # echo "[Adding eclass style repo]"
+    # # Setup eclass-craig
+    # cd ~/gitprojects
+    # if ! (git clone git@bitbucket.org:isteclass/boost-eclass-branding.git)
+    #     then
+    #     echo "Error cloning eclass-craig: is SSH key setup?"
+    #     exit 1
+    # fi
 
     echo "[Adding moodlescripts]"
     # Setup moodlescripts project
     cd ~/gitprojects
-    if ! (git clone git://github.com/cjamieso/moodlescripts.git)
-        then
-        echo "Error cloning moodlescripts."
-        exit 1
+    if [ ! -d "moodlescripts" ]; then
+        if ! (git clone git@github.com:cjamieso/moodlescripts.git)
+            then
+            echo "Error cloning moodlescripts."
+            exit 1
+        fi
+        cd moodlescripts
+        git remote set-url origin git@github.com:cjamieso/moodlescripts.git
+    else
+        echo "[moodlescripts repo already exists]"
     fi
-    cd moodlescripts
-    git remote set-url origin git@github.com:cjamieso/moodlescripts.git
 }
 
 function setup_config {
