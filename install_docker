@@ -10,8 +10,10 @@ sudo curl -L "https://github.com/docker/compose/releases/download/$COMPOSEVERSIO
 sudo chmod +x /usr/local/bin/docker-compose
 echo -e "sudo service docker start" >> ~/.bashrc
 
+echo "[----Select option 1 from list (iptables-legacy)----]"
+sudo update-alternatives --config iptables
+
 echo "next type sudo visudo and,"
 echo "add this line at the end:"
 echo "craig ALL=(ALL) NOPASSWD:/usr/sbin/service"
 echo "this will cause it to no longer ask you for your password when starting up"
-
