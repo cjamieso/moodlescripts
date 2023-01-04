@@ -63,14 +63,14 @@ function setup_repos {
         echo "[eclass repo already exists]"
     fi
 
-    # echo "[Adding eclass style repo]"
-    # # Setup eclass-craig
-    # cd ~/gitprojects
-    # if ! (git clone git@bitbucket.org:isteclass/boost-eclass-branding.git)
-    #     then
-    #     echo "Error cloning eclass-craig: is SSH key setup?"
-    #     exit 1
-    # fi
+    echo "[Adding eclass style repo]"
+    # Setup eclass-craig
+    cd ~/gitprojects
+    if ! (git clone git@bitbucket.org:isteclass/boost-eclass-branding.git)
+        then
+        echo "Error cloning eclass-craig: is SSH key setup?"
+        exit 1
+    fi
 
     echo "[Adding moodlescripts]"
     # Setup moodlescripts project
