@@ -88,6 +88,22 @@ function setup_repos {
     fi
 }
 
+function base_config {
+    echo "[Removing bell audio]"
+    # change set bell-style none in /etc/inputrc
+    sudo sed -i 's/# set bell-style none/set bell-style none/g' /etc/inputrc
+
+    # add line "set visualbell" to ~/.vimrc
+    touch ~/.vimrc
+    echo -e "set visualbell" >> ~/.vimrc
+
+    echo "[Configuring Locales]"
+    # Configuring locale
+    sudo locale-gen en_US.UTF-8
+    sudo dpkg-reconfigure locales
+
+}
+
 function setup_config {
     echo "[Performing config]"
     cd ~/
@@ -145,6 +161,8 @@ if [ "$1" = "repos" ]; then
     setup_repos
 elif [ "$1" = "config" ]; then
     setup_config
+elif [ "$1" = "base" ]; then
+    base_config
 elif [ "$1" = "permissions" ]; then
     permissions
 else
